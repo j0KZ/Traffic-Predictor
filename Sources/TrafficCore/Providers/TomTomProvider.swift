@@ -165,19 +165,42 @@ public struct TomTomProvider: TrafficProvider {
         return (decoded.incidents ?? []).enumerated().map { offset, raw in
             let props = raw.properties
             let category = Self.category(for: props?.iconCategory)
+            let location = raw.geometry?.coordinates?.firstCoordinate
             return TrafficIncident(
-                // TomTom no siempre manda id; sin uno estable el incidente
-                // seguiría siendo útil, así que sintetizamos uno por posición.
-                id: raw.id ?? "tomtom-\(offset)",
+                // TomTom no manda id en esta respuesta. Uno por posición sería
+                // inestable entre rondas y rompería el seguimiento del mismo
+                // incidente, así que se deriva del contenido.
+                id: raw.id ?? Self.syntheticID(
+                    category: category, location: location,
+                    startTime: props?.startTime, offset: offset
+                ),
                 category: category,
-                description: props?.events?.compactMap(\.description).first,
-                location: raw.geometry?.coordinates?.firstCoordinate,
+                // Varios eventos describen la misma causa con más detalle:
+                // "Obras" + "Nuevo trazado de carretera por obras".
+                description: Self.joinedDescription(props?.events?.compactMap(\.description)),
+                location: location,
                 startTime: ISO8601.parse(props?.startTime),
                 endTime: ISO8601.parse(props?.endTime),
                 delaySeconds: props?.delay,
                 severity: props?.magnitudeOfDelay
             )
         }
+    }
+
+    static func joinedDescription(_ descriptions: [String]?) -> String? {
+        var seen = Set<String>()
+        let parts = (descriptions ?? []).filter { seen.insert($0).inserted }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
+    /// Id derivado del contenido: el mismo incidente conserva su id entre
+    /// rondas aunque cambie de posición en la lista.
+    static func syntheticID(category: IncidentCategory, location: Coordinate?, startTime: String?, offset: Int) -> String {
+        guard let location else { return "tomtom-\(category.rawValue)-\(startTime ?? "sin-inicio")-\(offset)" }
+        return String(
+            format: "tomtom-%@-%.5f,%.5f-%@",
+            category.rawValue, location.lat, location.lon, startTime ?? "sin-inicio"
+        )
     }
 
     /// Tabla iconCategory de TomTom. Lo no mapeado cae en .unknown a propósito:
