@@ -1,0 +1,7 @@
+{
+  "incidents": [
+    { "type": "Feature", "id": "tomtom-x-999",
+      "geometry": { "type": "Point", "coordinates": [-71.1890, -32.7870] },
+      "properties": { "iconCategory": 99, "magnitudeOfDelay": 0, "events": [] } }
+  ]
+}

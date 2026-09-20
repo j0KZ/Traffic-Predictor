@@ -1,0 +1,30 @@
+{
+  "incidents": [
+    {
+      "type": "Feature",
+      "id": "tomtom-jam-001",
+      "geometry": { "type": "LineString",
+        "coordinates": [[-71.1890, -32.7870], [-71.1850, -32.7900]] },
+      "properties": {
+        "iconCategory": 6,
+        "magnitudeOfDelay": 3,
+        "events": [ { "description": "Tráfico lento", "code": 108 } ],
+        "startTime": "2026-09-20T14:12:00Z",
+        "delay": 900
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tomtom-works-002",
+      "geometry": { "type": "Point", "coordinates": [-70.9500, -33.0500] },
+      "properties": {
+        "iconCategory": 9,
+        "magnitudeOfDelay": 2,
+        "events": [ { "description": "Obras en la calzada", "code": 701 } ],
+        "startTime": "2026-09-20T08:00:00Z",
+        "endTime": "2026-09-20T18:00:00Z",
+        "delay": 420
+      }
+    }
+  ]
+}

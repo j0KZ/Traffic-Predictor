@@ -1,0 +1,21 @@
+{
+  "routes": [
+    {
+      "id": "route-here-001",
+      "sections": [
+        {
+          "id": "section-0",
+          "type": "vehicle",
+          "polyline": "BFoz5xJ67i1B1B7PzIhaxL7Y",
+          "summary": { "duration": 4100, "length": 92000, "baseDuration": 3200 }
+        },
+        {
+          "id": "section-1",
+          "type": "vehicle",
+          "polyline": "BFoz5xJ67i1B1B7PzIhaxL7Y",
+          "summary": { "duration": 3980, "length": 87104, "baseDuration": 3100 }
+        }
+      ]
+    }
+  ]
+}

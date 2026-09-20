@@ -1,0 +1,23 @@
+{
+  "routes": [
+    {
+      "summary": {
+        "lengthInMeters": 179104,
+        "travelTimeInSeconds": 8040,
+        "trafficDelayInSeconds": 1740,
+        "noTrafficTravelTimeInSeconds": 6300
+      },
+      "legs": [
+        { "points": [
+            { "latitude": -32.6558, "longitude": -71.4390 },
+            { "latitude": -32.7870, "longitude": -71.1890 },
+            { "latitude": -33.4089, "longitude": -70.5680 }
+        ] }
+      ],
+      "sections": [
+        { "startPointIndex": 1, "endPointIndex": 2, "sectionType": "TRAFFIC",
+          "simpleCategory": "JAM", "delayInSeconds": 1740 }
+      ]
+    }
+  ]
+}

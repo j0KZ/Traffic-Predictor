@@ -1,0 +1,6 @@
+{
+  "results": [
+    { "incidentDetails": { "id": "here-noloc-003", "type": "congestion",
+        "criticality": "low", "description": { "value": "Congestión" } } }
+  ]
+}

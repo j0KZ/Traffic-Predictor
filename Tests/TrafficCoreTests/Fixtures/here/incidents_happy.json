@@ -1,0 +1,32 @@
+{
+  "results": [
+    {
+      "location": {
+        "shape": { "links": [ { "points": [
+          { "lat": -32.7870, "lng": -71.1890 },
+          { "lat": -32.7900, "lng": -71.1850 }
+        ] } ] }
+      },
+      "incidentDetails": {
+        "id": "here-acc-001",
+        "type": "accident",
+        "criticality": "major",
+        "description": { "value": "Accidente de tránsito, pista derecha bloqueada" },
+        "startTime": "2026-09-20T15:05:00Z"
+      }
+    },
+    {
+      "location": {
+        "shape": { "links": [ { "points": [ { "lat": -33.0500, "lng": -70.9500 } ] } ] }
+      },
+      "incidentDetails": {
+        "id": "here-cons-002",
+        "type": "construction",
+        "criticality": "minor",
+        "description": { "value": "Trabajos de mantenimiento programados" },
+        "startTime": "2026-09-20T08:00:00Z",
+        "endTime": "2026-09-20T18:00:00Z"
+      }
+    }
+  ]
+}

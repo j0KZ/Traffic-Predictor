@@ -1,0 +1,14 @@
+{
+  "incidents": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": null },
+      "properties": {
+        "iconCategory": 1,
+        "magnitudeOfDelay": 4,
+        "events": [ { "description": "Accidente", "code": 201 } ],
+        "startTime": "2026-09-20T15:00:00Z"
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "routes": [
+    { "sections": [
+        { "polyline": "@@@not-a-polyline@@@",
+          "summary": { "duration": 4100, "length": 92000, "baseDuration": 3200 } }
+    ] }
+  ]
+}
