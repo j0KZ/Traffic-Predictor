@@ -1,15 +1,72 @@
 {
   "code": "Ok",
+  "uuid": "gI6eJJnJ-Srwop5B-Qo-1eQHDoN2PwWBojSxaEzKJmIJjzrHr2IZhw==",
+  "waypoints": [
+    {
+      "location": [
+        -71.438947,
+        -32.655843
+      ],
+      "name": "",
+      "distance": 6.898,
+      "time_zone": {
+        "offset": "-03:00",
+        "identifier": "America/Santiago"
+      }
+    },
+    {
+      "location": [
+        -71.18899,
+        -32.787068
+      ],
+      "name": "Carrera",
+      "distance": 7.581,
+      "time_zone": {
+        "offset": "-03:00",
+        "identifier": "America/Santiago"
+      }
+    },
+    {
+      "location": [
+        -70.567992,
+        -33.408919
+      ],
+      "name": "Avenida Apoquindo",
+      "distance": 2.208,
+      "time_zone": {
+        "offset": "-03:00",
+        "identifier": "America/Santiago"
+      }
+    }
+  ],
   "routes": [
     {
-      "duration": 8210.4,
-      "duration_typical": 7450.2,
-      "distance": 178902.3,
+      "geometry": "~aifEl|_sLN{Ab@HYpCIn@CBCDCD?F@FBD@BDBB?D?DABCBC@E@GAGAECEx@",
+      "distance": 164793.078,
+      "duration": 7021.315,
+      "weight": 8381.151,
       "weight_name": "auto",
-      "geometry": "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
+      "duration_typical": 7081.491,
+      "weight_typical": 8336.663,
       "legs": [
-        { "duration": 8210.4, "distance": 178902.3,
-          "annotation": { "congestion": ["low", "moderate", "heavy", "severe", "unknown"] } }
+        {
+          "summary": "Bypass Puchuncaví, F-20",
+          "distance": 43859.035,
+          "duration": 2156.357,
+          "duration_typical": 2134.466,
+          "annotation": {
+            "congestion": [
+              "unknown",
+              "unknown",
+              "low",
+              "low",
+              "moderate",
+              "heavy",
+              "unknown",
+              "low"
+            ]
+          }
+        }
       ]
     }
   ]

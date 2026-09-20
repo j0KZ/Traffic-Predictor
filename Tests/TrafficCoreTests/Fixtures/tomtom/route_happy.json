@@ -1,22 +1,75 @@
 {
+  "formatVersion": "0.0.12",
   "routes": [
     {
       "summary": {
-        "lengthInMeters": 179104,
-        "travelTimeInSeconds": 8040,
-        "trafficDelayInSeconds": 1740,
-        "noTrafficTravelTimeInSeconds": 6300
+        "lengthInMeters": 161479,
+        "travelTimeInSeconds": 8412,
+        "trafficDelayInSeconds": 1079,
+        "trafficLengthInMeters": 6037,
+        "departureTime": "2026-09-20T16:21:55-03:00",
+        "arrivalTime": "2026-09-20T18:42:07-03:00",
+        "noTrafficTravelTimeInSeconds": 7244,
+        "historicTrafficTravelTimeInSeconds": 7573,
+        "liveTrafficIncidentsTravelTimeInSeconds": 8412
       },
       "legs": [
-        { "points": [
-            { "latitude": -32.6558, "longitude": -71.4390 },
-            { "latitude": -32.7870, "longitude": -71.1890 },
-            { "latitude": -33.4089, "longitude": -70.5680 }
-        ] }
+        {
+          "summary": {
+            "lengthInMeters": 43852,
+            "travelTimeInSeconds": 2292,
+            "trafficDelayInSeconds": 0,
+            "trafficLengthInMeters": 0,
+            "departureTime": "2026-09-20T16:21:55-03:00",
+            "arrivalTime": "2026-09-20T17:00:07-03:00",
+            "noTrafficTravelTimeInSeconds": 2302,
+            "historicTrafficTravelTimeInSeconds": 2395,
+            "liveTrafficIncidentsTravelTimeInSeconds": 2292,
+            "originalWaypointIndexAtEndOfLeg": 0
+          },
+          "points": [
+            {
+              "latitude": -32.65585,
+              "longitude": -71.43892
+            },
+            {
+              "latitude": -32.65592,
+              "longitude": -71.43852
+            },
+            {
+              "latitude": -32.65608,
+              "longitude": -71.43856
+            },
+            {
+              "latitude": -32.65595,
+              "longitude": -71.43929
+            },
+            {
+              "latitude": -32.65588,
+              "longitude": -71.43963
+            }
+          ]
+        }
       ],
       "sections": [
-        { "startPointIndex": 1, "endPointIndex": 2, "sectionType": "TRAFFIC",
-          "simpleCategory": "JAM", "delayInSeconds": 1740 }
+        {
+          "startPointIndex": 1043,
+          "endPointIndex": 1098,
+          "sectionType": "TRAFFIC",
+          "simpleCategory": "JAM",
+          "effectiveSpeedInKmh": 17,
+          "delayInSeconds": 1079,
+          "magnitudeOfDelay": 3,
+          "tec": {
+            "causes": [
+              {
+                "mainCauseCode": 1
+              }
+            ],
+            "effectCode": 6
+          },
+          "eventId": "TTL29389449369569000"
+        }
       ]
     }
   ]

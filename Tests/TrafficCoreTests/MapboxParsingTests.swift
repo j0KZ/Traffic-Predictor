@@ -10,8 +10,9 @@ final class MapboxParsingTests: XCTestCase {
         let sample = try await provider(StubHTTPClient(fixture: "mapbox/happy.json")).fetch(testQuery)
 
         XCTAssertEqual(sample.provider, .mapbox)
-        XCTAssertEqual(sample.durationSeconds, 8210, "se trunca al segundo")
-        XCTAssertEqual(sample.distanceMeters, 178902)
+        // Valores reales capturados el 2026-09-20 sobre Ruta 5 Norte.
+        XCTAssertEqual(sample.durationSeconds, 7021, "se trunca al segundo")
+        XCTAssertEqual(sample.distanceMeters, 164_793)
         XCTAssertNotNil(sample.polyline)
         XCTAssertTrue(sample.incidents.isEmpty, "Mapbox no entrega incidentes discretos")
     }
@@ -23,7 +24,26 @@ final class MapboxParsingTests: XCTestCase {
         XCTAssertNil(sample.freeFlowSeconds)
         XCTAssertNil(sample.delaySeconds)
         // El baseline del operador sí produce un delay real.
-        XCTAssertEqual(sample.delaySeconds(baseline: 6300), 1910)
+        XCTAssertEqual(sample.delaySeconds(baseline: 6300), 721)
+    }
+
+    func testCoverageMeasuresHowMuchTrafficDataThereActuallyIs() async throws {
+        // Mapbox marca "unknown" donde no tiene cobertura. En Ruta 5 Norte eso
+        // fue el 67% del trazado en la captura real: su ETA es mayormente
+        // tiempo histórico, no medición en vivo.
+        let sample = try await provider(StubHTTPClient(fixture: "mapbox/happy.json")).fetch(testQuery)
+        let coverage = try XCTUnwrap(sample.trafficCoverage)
+        XCTAssertEqual(coverage, 5.0 / 8.0, accuracy: 0.001)
+    }
+
+    func testCoverageIsNilWhenNoAnnotationsRequested() {
+        XCTAssertNil(MapboxProvider.coverage(nil))
+        XCTAssertNil(MapboxProvider.coverage([]))
+    }
+
+    func testCoverageIsZeroWhenEverythingIsUnknown() {
+        let coverage = try? XCTUnwrap(MapboxProvider.coverage(["unknown", "unknown"]))
+        XCTAssertEqual(coverage ?? -1, 0)
     }
 
     func testNoRouteCodeWith200IsNoRoute() async {

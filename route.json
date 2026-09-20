@@ -1,11 +1,22 @@
 {
   "id": "maitencillo-lascondes-r5n",
   "label": "Maitencillo a Las Condes via Ruta 5 Norte",
-  "origin":      { "lat": -32.6558, "lon": -71.4390 },
-  "destination": { "lat": -33.4089, "lon": -70.5680 },
+  "origin": {
+    "lat": -32.6558,
+    "lon": -71.439
+  },
+  "destination": {
+    "lat": -33.4089,
+    "lon": -70.568
+  },
   "waypoints": [
-    { "lat": -32.7870, "lon": -71.1890, "note": "La Calera, fuerza Ruta 5 Norte" }
+    {
+      "lat": -32.787,
+      "lon": -71.189,
+      "note": "La Calera, fuerza Ruta 5 Norte"
+    }
   ],
   "freeFlowBaselineSeconds": 6300,
-  "notes": "Baseline 1h45 en flujo libre, dato del operador. Descartar rutas con distancia muy distinta: significa ruteo por la costa."
+  "expectedDistanceMeters": 163000,
+  "notes": "Distancia medida 2026-09-20: TomTom 161.5 km, Mapbox 164.8 km. expectedDistanceMeters=163000 permite detectar ruteo por la costa aun con solo dos fuentes. OJO: el baseline de 6300s (1h45) implica 92 km/h de promedio; el free-flow que reporta TomTom para este corredor es 7244s (2h01, 80 km/h). El delay contra baseline sale inflado ~15 min. Revisar el dato del operador contra un viaje real antes de confiar en esa columna."
 }

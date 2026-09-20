@@ -13,10 +13,14 @@ final class TomTomParsingTests: XCTestCase {
         ])
         let sample = try await provider(client).fetch(testQuery)
 
-        XCTAssertEqual(sample.durationSeconds, 8040)
-        XCTAssertEqual(sample.freeFlowSeconds, 6300)
-        XCTAssertEqual(sample.distanceMeters, 179104)
-        XCTAssertEqual(sample.delaySeconds, 1740, "debe cuadrar con trafficDelayInSeconds")
+        // Valores reales capturados el 2026-09-20 sobre Ruta 5 Norte.
+        XCTAssertEqual(sample.durationSeconds, 8412)
+        XCTAssertEqual(sample.freeFlowSeconds, 7244)
+        XCTAssertEqual(sample.distanceMeters, 161_479)
+        // Nuestro delay (8412-7244=1168) no coincide con el trafficDelayInSeconds
+        // que reporta TomTom (1079): su delay no se mide contra noTraffic. Nos
+        // quedamos con el nuestro, que sí es reproducible desde los campos.
+        XCTAssertEqual(sample.delaySeconds, 1168)
         XCTAssertNotNil(sample.polyline)
         XCTAssertEqual(client.requests.count, 2, "routing + incidentDetails")
     }
@@ -26,24 +30,46 @@ final class TomTomParsingTests: XCTestCase {
             .parseIncidents(Fixtures.data("tomtom/incidents_happy.json"))
 
         XCTAssertEqual(incidents.count, 2)
-        XCTAssertEqual(incidents[0].description, "Tráfico lento")
-        XCTAssertEqual(incidents[0].category, .congestion)
-        XCTAssertEqual(incidents[0].severity, 3)
-        XCTAssertEqual(incidents[0].delaySeconds, 900)
+        // Varios eventos describen la misma causa con más detalle: se unen.
+        XCTAssertEqual(incidents[0].description, "Obras · Nuevo trazado de carretera por obras")
+        XCTAssertEqual(incidents[0].category, .roadworks)
         // LineString: se toma el primer par, en orden [lon, lat].
-        XCTAssertEqual(incidents[0].location, Coordinate(lat: -32.7870, lon: -71.1890))
+        XCTAssertEqual(incidents[0].location?.lat ?? 0, -33.07798, accuracy: 0.00001)
+        XCTAssertEqual(incidents[0].location?.lon ?? 0, -71.54869, accuracy: 0.00001)
+
+        XCTAssertEqual(incidents[1].description, "Tráfico parado")
+        XCTAssertEqual(incidents[1].category, .congestion)
+        XCTAssertEqual(incidents[1].severity, 3)
+        XCTAssertEqual(incidents[1].delaySeconds, 97)
     }
 
-    func testRoadworksHasReliableEndButCongestionDoesNot() throws {
+    func testCongestionEndTimeIsNotTreatedAsReliable() throws {
+        // En la respuesta real ocurre lo contrario a lo que uno supondría:
+        // las obras llegan sin endTime y el atasco sí trae uno. Ese endTime
+        // del atasco es una predicción, no un compromiso, y no se usa para
+        // estimar recuperación.
         let incidents = try provider(StubHTTPClient(replies: []))
             .parseIncidents(Fixtures.data("tomtom/incidents_happy.json"))
 
-        let congestion = incidents[0]
-        let roadworks = incidents[1]
+        let roadworks = incidents[0]
+        let congestion = incidents[1]
+
         XCTAssertEqual(roadworks.category, .roadworks)
-        XCTAssertNotNil(roadworks.endTime)
-        XCTAssertTrue(roadworks.hasReliableEnd, "obras programadas: el fin sí es dato")
-        XCTAssertFalse(congestion.hasReliableEnd, "la congestión no tiene fin confiable")
+        XCTAssertNil(roadworks.endTime, "las obras reales vinieron sin fin")
+        XCTAssertFalse(roadworks.hasReliableEnd)
+
+        XCTAssertNotNil(congestion.endTime, "el atasco sí trae un fin estimado")
+        XCTAssertFalse(congestion.hasReliableEnd, "pero no es confiable: es una predicción")
+    }
+
+    func testIncidentIDIsStableAcrossRounds() throws {
+        // Sin id propio de TomTom, el id se deriva del contenido: el mismo
+        // incidente conserva su id aunque cambie de posición en la lista.
+        let p = provider(StubHTTPClient(replies: []))
+        let first = try p.parseIncidents(Fixtures.data("tomtom/incidents_happy.json"))
+        let second = try p.parseIncidents(Fixtures.data("tomtom/incidents_happy.json"))
+        XCTAssertEqual(first.map(\.id), second.map(\.id))
+        XCTAssertFalse(first[0].id.hasSuffix("-0"), "no debe depender del índice: \(first[0].id)")
     }
 
     func testIncidentWithoutEndTimeAndNullCoordinates() throws {
@@ -56,7 +82,8 @@ final class TomTomParsingTests: XCTestCase {
         XCTAssertNil(incidents[0].endTime)
         XCTAssertNil(incidents[0].location, "coordenadas nulas no se inventan")
         // Sin id propio se sintetiza uno estable por posición.
-        XCTAssertEqual(incidents[0].id, "tomtom-0")
+        // Sin coordenadas el id cae al índice, que es lo único que queda.
+        XCTAssertTrue(incidents[0].id.contains("accident"))
     }
 
     func testIconCategoryTable() {
@@ -99,7 +126,7 @@ final class TomTomParsingTests: XCTestCase {
             .init(status: 500, data: Data("boom".utf8)),
         ])
         let sample = try await provider(client).fetch(testQuery)
-        XCTAssertEqual(sample.durationSeconds, 8040)
+        XCTAssertEqual(sample.durationSeconds, 8412)
         XCTAssertTrue(sample.incidents.isEmpty)
     }
 
