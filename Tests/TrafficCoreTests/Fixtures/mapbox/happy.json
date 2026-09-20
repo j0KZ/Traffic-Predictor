@@ -1,0 +1,16 @@
+{
+  "code": "Ok",
+  "routes": [
+    {
+      "duration": 8210.4,
+      "duration_typical": 7450.2,
+      "distance": 178902.3,
+      "weight_name": "auto",
+      "geometry": "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
+      "legs": [
+        { "duration": 8210.4, "distance": 178902.3,
+          "annotation": { "congestion": ["low", "moderate", "heavy", "severe", "unknown"] } }
+      ]
+    }
+  ]
+}

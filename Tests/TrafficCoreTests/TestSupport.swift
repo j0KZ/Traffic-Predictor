@@ -83,6 +83,7 @@ extension CredentialStore {
             "TRAFFICLENS_GOOGLE_KEY": "test-google",
             "TRAFFICLENS_TOMTOM_KEY": "test-tomtom",
             "TRAFFICLENS_HERE_KEY": "test-here",
+            "TRAFFICLENS_MAPBOX_KEY": "test-mapbox",
         ])
     }
 }

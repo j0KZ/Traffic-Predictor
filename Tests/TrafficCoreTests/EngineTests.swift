@@ -17,14 +17,14 @@ final class EngineTests: XCTestCase {
         XCTAssertTrue(round.failures[.google]!.contains("500"), "el error exacto, no un resumen")
     }
 
-    func testAllThreeDownIsAnEmptyRoundNotACrash() async {
+    func testEveryProviderDownIsAnEmptyRoundNotACrash() async {
         let engine = SamplingEngine(providers: ProviderID.allCases.map {
             FakeProvider(id: $0, result: .failure(.transport("red caída")))
         })
         let round = await engine.runOnce(testQuery)
 
         XCTAssertTrue(round.samples.isEmpty)
-        XCTAssertEqual(round.failures.count, 3)
+        XCTAssertEqual(round.failures.count, ProviderID.allCases.count)
         XCTAssertEqual(DivergenceAnalyzer.analyze(round.samples).verdict, .insufficient)
     }
 

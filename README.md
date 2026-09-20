@@ -2,7 +2,8 @@
 
 Comparador multi-fuente de ETA en vivo con mapa base offline.
 
-Fuentes: Google Routes API, TomTom, HERE.
+Fuentes: TomTom, HERE, Mapbox (driving-traffic). Google Routes queda
+implementado pero fuera del set por defecto: exige billing con tarjeta.
 Ruta de referencia: Maitencillo a Las Condes via Ruta 5 Norte. Baseline 1h45.
 
 ## Setup
