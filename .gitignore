@@ -1,0 +1,14 @@
+.build/
+.swiftpm/
+*.xcodeproj
+*.xcworkspace
+DerivedData/
+*.pmtiles
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.env
+.env.*
+!.env.example
+Tests/TrafficCoreTests/Fixtures/live/
+.DS_Store

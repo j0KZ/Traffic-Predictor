@@ -1,0 +1,11 @@
+{
+  "id": "maitencillo-lascondes-r5n",
+  "label": "Maitencillo a Las Condes via Ruta 5 Norte",
+  "origin":      { "lat": -32.6558, "lon": -71.4390 },
+  "destination": { "lat": -33.4089, "lon": -70.5680 },
+  "waypoints": [
+    { "lat": -32.7870, "lon": -71.1890, "note": "La Calera, fuerza Ruta 5 Norte" }
+  ],
+  "freeFlowBaselineSeconds": 6300,
+  "notes": "Baseline 1h45 en flujo libre, dato del operador. Descartar rutas con distancia muy distinta: significa ruteo por la costa."
+}
