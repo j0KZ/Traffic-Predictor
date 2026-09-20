@@ -10,6 +10,10 @@ public struct RouteQuery: Sendable, Equatable {
     public let departAt: Date?
     /// 6300 para Ruta 5 Norte. Dato del operador, no del proveedor.
     public let freeFlowBaselineSeconds: Int?
+    /// Distancia conocida del corredor. Con esto se detecta al que rutea por
+    /// la costa aunque haya solo dos fuentes: no hace falta mayoría si se
+    /// sabe cuánto mide el camino correcto.
+    public let expectedDistanceMeters: Int?
 
     public init(
         id: String,
@@ -17,7 +21,8 @@ public struct RouteQuery: Sendable, Equatable {
         destination: Coordinate,
         waypoints: [Coordinate] = [],
         departAt: Date? = nil,
-        freeFlowBaselineSeconds: Int? = nil
+        freeFlowBaselineSeconds: Int? = nil,
+        expectedDistanceMeters: Int? = nil
     ) {
         self.id = id
         self.origin = origin
@@ -25,5 +30,6 @@ public struct RouteQuery: Sendable, Equatable {
         self.waypoints = waypoints
         self.departAt = departAt
         self.freeFlowBaselineSeconds = freeFlowBaselineSeconds
+        self.expectedDistanceMeters = expectedDistanceMeters
     }
 }

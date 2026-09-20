@@ -86,3 +86,64 @@ final class DivergenceTests: XCTestCase {
         XCTAssertEqual(d.verdict, .majorSpread)
     }
 }
+
+/// Con solo dos fuentes vivas, la distancia esperada del corredor reemplaza
+/// a la mayoría que ya no tenemos.
+final class ExpectedDistanceDivergenceTests: XCTestCase {
+    private let rutaCinco = 179_000
+
+    private func analyze(_ samples: [ETASample], expected: Int?) -> Divergence {
+        DivergenceAnalyzer.analyze(
+            Dictionary(uniqueKeysWithValues: samples.map { ($0.provider, $0) }),
+            expectedDistanceMeters: expected
+        )
+    }
+
+    func testCoastalRouteIsExcludedWithOnlyTwoSources() {
+        let d = analyze([
+            makeSample(.mapbox, duration: 6000, distance: 120_000),
+            makeSample(.tomtom, duration: 9000, distance: 179_104),
+        ], expected: rutaCinco)
+
+        XCTAssertEqual(d.divergentRoutes, [.mapbox])
+        // Queda una sola fuente sobre el corredor real: se reporta su dato,
+        // pero sin pretender consenso.
+        XCTAssertEqual(d.median, 9000)
+        XCTAssertEqual(d.verdict, .insufficient)
+    }
+
+    func testBothOnCorridorGivesARealVerdict() {
+        let d = analyze([
+            makeSample(.mapbox, duration: 8900, distance: 178_400),
+            makeSample(.tomtom, duration: 9000, distance: 179_104),
+        ], expected: rutaCinco)
+
+        XCTAssertTrue(d.divergentRoutes.isEmpty)
+        XCTAssertEqual(d.verdict, .consensus)
+        XCTAssertEqual(d.median, 8900)
+    }
+
+    func testSingleSourceOnTheWrongCorridorIsCaught() {
+        // Sin la distancia esperada esto pasaría como dato bueno.
+        let d = analyze([makeSample(.mapbox, duration: 6000, distance: 120_000)], expected: rutaCinco)
+        XCTAssertEqual(d.divergentRoutes, [.mapbox])
+        XCTAssertEqual(d.verdict, .insufficient)
+    }
+
+    func testWithoutExpectedDistanceTwoSourcesStillExcludeNobody() {
+        let d = analyze([
+            makeSample(.mapbox, duration: 6000, distance: 120_000),
+            makeSample(.tomtom, duration: 9000, distance: 179_104),
+        ], expected: nil)
+        XCTAssertTrue(d.divergentRoutes.isEmpty, "sin referencia no se acusa a nadie")
+    }
+
+    func testSmallDistanceDifferencesAreNotDivergence()  {
+        // Variación normal de trazado, no otro corredor.
+        let d = analyze([
+            makeSample(.mapbox, duration: 8900, distance: 172_000),
+            makeSample(.tomtom, duration: 9000, distance: 186_000),
+        ], expected: rutaCinco)
+        XCTAssertTrue(d.divergentRoutes.isEmpty)
+    }
+}

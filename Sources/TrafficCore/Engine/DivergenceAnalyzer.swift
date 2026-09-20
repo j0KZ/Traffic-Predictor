@@ -24,12 +24,15 @@ public enum DivergenceAnalyzer {
     public static let distanceDivergenceRatio = 0.15
     public static let outlierRatio = 0.15
 
-    public static func analyze(_ samples: [ProviderID: ETASample]) -> Divergence {
+    public static func analyze(
+        _ samples: [ProviderID: ETASample],
+        expectedDistanceMeters: Int? = nil
+    ) -> Divergence {
         let all = Array(samples.values)
 
         // Primero se apartan los que rutean por otro lado: promediar su ETA
         // contra las demás mezclaría dos rutas distintas.
-        let divergent = divergentRouteProviders(all)
+        let divergent = divergentRouteProviders(all, expected: expectedDistanceMeters)
         let usable = all.filter { !divergent.contains($0.provider) }
 
         guard usable.count >= 2 else {
@@ -76,16 +79,22 @@ public enum DivergenceAnalyzer {
         )
     }
 
-    /// Con menos de 3 fuentes no hay mayoría que defina cuál es "el corredor
-    /// correcto", así que no se excluye a nadie.
-    static func divergentRouteProviders(_ samples: [ETASample]) -> [ProviderID] {
-        guard samples.count >= 3 else { return [] }
-        let distances = samples.map(\.distanceMeters).sorted()
-        let medianDistance = medianOf(distances)
-        guard medianDistance > 0 else { return [] }
+    /// Con la distancia esperada del corredor basta una sola fuente para
+    /// saber que se fue por otro lado. Sin ella hace falta mayoría: con menos
+    /// de 3 fuentes no hay forma de decidir cuál es "el corredor correcto",
+    /// así que no se excluye a nadie.
+    static func divergentRouteProviders(_ samples: [ETASample], expected: Int?) -> [ProviderID] {
+        let reference: Int
+        if let expected, expected > 0 {
+            reference = expected
+        } else {
+            guard samples.count >= 3 else { return [] }
+            reference = medianOf(samples.map(\.distanceMeters).sorted())
+        }
+        guard reference > 0 else { return [] }
 
         return samples
-            .filter { abs(Double($0.distanceMeters - medianDistance)) / Double(medianDistance) > distanceDivergenceRatio }
+            .filter { abs(Double($0.distanceMeters - reference)) / Double(reference) > distanceDivergenceRatio }
             .map(\.provider)
     }
 
