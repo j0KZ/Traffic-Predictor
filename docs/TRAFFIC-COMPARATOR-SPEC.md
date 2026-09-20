@@ -530,3 +530,32 @@ es información valiosa, no un fracaso del proyecto.
 
 Guarda esa sesión de 45 minutos como dataset de referencia. Es lo que te permite
 calibrar cuánto creerle a cada fuente en viajes futuros.
+
+---
+
+## Apéndice A: cambio de proveedor (2026-09-20)
+
+El set por defecto es **TomTom + HERE + Mapbox**, no Google.
+
+Razón: Google Routes con `TRAFFIC_AWARE_OPTIMAL` exige billing activo con
+tarjeta. Los otros tres tiers son gratis de verdad.
+
+`GoogleRoutesProvider` queda implementado y testeado: si en algún momento se
+activa billing, entra al set cambiando una línea.
+
+Mapbox ocupa exactamente el lugar que tenía Google:
+- ETA con tráfico vía perfil `driving-traffic`
+- Congestión por segmento vía `annotations=congestion`, equivalente a los
+  `speedReadingIntervals` de Google
+- Sin incidentes discretos: responde "dónde", no "por qué"
+
+El "por qué" sigue dependiendo enteramente de TomTom y HERE.
+
+**Cuota que manda:** TomTom Traffic Incident Details, 2.500/mes. Es el techo
+real del muestreo, no el routing (20K/mes). A 300s por ronda son ~208 horas
+de muestreo continuo al mes.
+
+**Nota sobre `duration_typical`:** Mapbox lo entrega, pero es el tiempo
+habitual a esa hora, no el de flujo libre. Llenar `freeFlowSeconds` con él
+daría un delay que no es delay, así que se deja nil y manda el baseline del
+operador (6300s).
