@@ -12,6 +12,11 @@ public struct ETASample: Codable, Sendable, Identifiable, Equatable {
     /// Encoded, para dibujar. Ya normalizado a Google encoded polyline.
     public let polyline: String?
     public var incidents: [TrafficIncident]
+    /// Fracción del trazado para la que el proveedor tiene datos de tráfico
+    /// reales (0.0 a 1.0). nil si el proveedor no lo informa.
+    /// Una fuente con cobertura baja no está midiendo tráfico: está
+    /// devolviendo su tiempo histórico y pareciendo optimista.
+    public let trafficCoverage: Double?
 
     public init(
         id: UUID = UUID(),
@@ -21,7 +26,8 @@ public struct ETASample: Codable, Sendable, Identifiable, Equatable {
         freeFlowSeconds: Int? = nil,
         distanceMeters: Int,
         polyline: String? = nil,
-        incidents: [TrafficIncident] = []
+        incidents: [TrafficIncident] = [],
+        trafficCoverage: Double? = nil
     ) {
         self.id = id
         self.provider = provider
@@ -31,6 +37,7 @@ public struct ETASample: Codable, Sendable, Identifiable, Equatable {
         self.distanceMeters = distanceMeters
         self.polyline = polyline
         self.incidents = incidents
+        self.trafficCoverage = trafficCoverage
     }
 
     /// Sobrecosto por tráfico segun el free-flow del proveedor. nil si no lo dio.

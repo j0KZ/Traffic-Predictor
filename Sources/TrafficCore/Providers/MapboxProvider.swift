@@ -47,13 +47,20 @@ public struct MapboxProvider: TrafficProvider {
 
     private struct Response: Decodable {
         struct Route: Decodable {
+            struct Leg: Decodable {
+                struct Annotation: Decodable {
+                    let congestion: [String]?
+                }
+                let annotation: Annotation?
+            }
             let duration: Double?
             let durationTypical: Double?
             let distance: Double?
             let geometry: String?
+            let legs: [Leg]?
 
             enum CodingKeys: String, CodingKey {
-                case duration, distance, geometry
+                case duration, distance, geometry, legs
                 case durationTypical = "duration_typical"
             }
         }
@@ -93,7 +100,17 @@ public struct MapboxProvider: TrafficProvider {
             freeFlowSeconds: nil,
             distanceMeters: Int(distance),
             polyline: route.geometry,
-            incidents: []
+            incidents: [],
+            trafficCoverage: Self.coverage(route.legs?.flatMap { $0.annotation?.congestion ?? [] })
         )
+    }
+
+    /// Fracción de segmentos con dato de congestión real. Mapbox marca
+    /// "unknown" donde no tiene cobertura, y ahí su ETA es el tiempo
+    /// histórico disfrazado de tiempo en vivo.
+    static func coverage(_ congestion: [String]?) -> Double? {
+        guard let values = congestion, !values.isEmpty else { return nil }
+        let known = values.filter { $0 != "unknown" }.count
+        return Double(known) / Double(values.count)
     }
 }

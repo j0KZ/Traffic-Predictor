@@ -60,6 +60,9 @@ public actor SampleStore {
                 );
                 """)
         }
+        migrator.registerMigration("v2-traffic-coverage") { db in
+            try db.execute(sql: "ALTER TABLE sample ADD COLUMN traffic_coverage REAL;")
+        }
         try migrator.migrate(queue)
     }
 
@@ -68,13 +71,14 @@ public actor SampleStore {
             for sample in round.samples.values {
                 try db.execute(sql: """
                     INSERT OR REPLACE INTO sample
-                    (id, route_id, provider, captured_at, duration_s, free_flow_s, distance_m, polyline)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                    (id, route_id, provider, captured_at, duration_s, free_flow_s,
+                     distance_m, polyline, traffic_coverage)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
                     """, arguments: [
                         sample.id.uuidString, routeID, sample.provider.rawValue,
                         Int(sample.capturedAt.timeIntervalSince1970),
                         sample.durationSeconds, sample.freeFlowSeconds,
-                        sample.distanceMeters, sample.polyline,
+                        sample.distanceMeters, sample.polyline, sample.trafficCoverage,
                     ])
 
                 for incident in sample.incidents {
@@ -130,7 +134,8 @@ public actor SampleStore {
                     freeFlowSeconds: row["free_flow_s"],
                     distanceMeters: row["distance_m"],
                     polyline: row["polyline"],
-                    incidents: incidents
+                    incidents: incidents,
+                    trafficCoverage: row["traffic_coverage"]
                 )
             }
         }
