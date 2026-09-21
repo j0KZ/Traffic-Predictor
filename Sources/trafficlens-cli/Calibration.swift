@@ -71,7 +71,7 @@ struct Calibrate: AsyncParsableCommand {
                 let reading = r > 0.8 ? "sigue la curva" : r > 0.4 ? "la sigue a medias" : "no la sigue"
                 print(String(format: "  correlación de tendencia: %.2f (%@)", r, reading))
             } else {
-                print("  correlación de tendencia: sin datos (menos de 3 pares o serie plana)")
+                print("  correlación de tendencia: sin datos (menos de 3 pares o la referencia no se movió ≥3 min)")
             }
             if bias.isUsableForCorrection {
                 print("  corrección utilizable")

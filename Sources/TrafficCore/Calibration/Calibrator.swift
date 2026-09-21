@@ -9,6 +9,10 @@ public enum Calibrator {
     /// Por debajo de esta cantidad de pares el factor se informa pero no se
     /// ofrece como corrección.
     public static let minimumPairsForCorrection = 8
+    /// La referencia tiene que moverse al menos esto para que exista una
+    /// curva que seguir. Con 16 s de variación de madrugada, una correlación
+    /// de 1.00 es ruido de redondeo, no seguimiento.
+    public static let minimumReferenceRange = 180
 
     public struct Pair: Sendable, Equatable {
         public let sample: Int
@@ -76,11 +80,17 @@ public enum Calibrator {
                     pairs: pairs,
                     ratio: ratios[(ratios.count - 1) / 2],
                     offsetSeconds: offsets[(offsets.count - 1) / 2],
-                    trendCorrelation: correlation(pairs.map { Double($0.sample) }, pairs.map { Double($0.reference) })
+                    trendCorrelation: trend(pairs)
                 ))
             }
         }
         return result
+    }
+
+    static func trend(_ pairs: [Pair]) -> Double? {
+        let refs = pairs.map(\.reference)
+        guard let lo = refs.min(), let hi = refs.max(), hi - lo >= minimumReferenceRange else { return nil }
+        return correlation(pairs.map { Double($0.sample) }, refs.map(Double.init))
     }
 
     /// Pearson. nil si alguna serie no varía: sin variación no hay curva

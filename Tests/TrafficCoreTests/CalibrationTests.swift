@@ -73,6 +73,15 @@ final class CalibrationTests: XCTestCase {
         XCTAssertNil(mapbox.trendCorrelation)
     }
 
+    func testNightFlatReferenceHasNoTrend() throws {
+        // Pares reales de madrugada: Waze se movió 16 s. Sin curva no hay
+        // correlación que informar, aunque la aritmética dé 1.00.
+        let samples = [sample(.tomtom, 6658, at: 0), sample(.tomtom, 6657, at: 4), sample(.tomtom, 6659, at: 5)]
+        let refs = [waze(7620, at: 0), waze(7613, at: 4), waze(7629, at: 5)]
+        let tomtom = try XCTUnwrap(Calibrator.bias(samples: samples, references: refs).first)
+        XCTAssertNil(tomtom.trendCorrelation)
+    }
+
     func testReferenceRoundTripThroughStore() async throws {
         let store = try SampleStore.inMemory()
         let reading = waze(7620, at: 0)
