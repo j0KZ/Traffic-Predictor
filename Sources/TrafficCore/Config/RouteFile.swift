@@ -1,25 +1,24 @@
 import Foundation
-import TrafficCore
 
 /// Forma de route.json. Se mantiene separada de RouteQuery: el archivo es
 /// configuración del operador, no el modelo del core.
-struct RouteFile: Decodable {
-    struct Point: Decodable {
-        let lat: Double
-        let lon: Double
-        let note: String?
+public struct RouteFile: Decodable, Sendable {
+    public struct Point: Decodable, Sendable {
+        public let lat: Double
+        public let lon: Double
+        public let note: String?
     }
 
-    let id: String
-    let label: String?
-    let origin: Point
-    let destination: Point
-    let waypoints: [Point]?
-    let freeFlowBaselineSeconds: Int?
-    let expectedDistanceMeters: Int?
-    let notes: String?
+    public let id: String
+    public let label: String?
+    public let origin: Point
+    public let destination: Point
+    public let waypoints: [Point]?
+    public let freeFlowBaselineSeconds: Int?
+    public let expectedDistanceMeters: Int?
+    public let notes: String?
 
-    func query() -> RouteQuery {
+    public func query() -> RouteQuery {
         RouteQuery(
             id: id,
             origin: Coordinate(lat: origin.lat, lon: origin.lon),
@@ -30,7 +29,7 @@ struct RouteFile: Decodable {
         )
     }
 
-    static func load(_ path: String) throws -> RouteFile {
+    public static func load(_ path: String) throws -> RouteFile {
         let url = URL(fileURLWithPath: path)
         let data = try Data(contentsOf: url)
         return try JSONDecoder().decode(RouteFile.self, from: data)

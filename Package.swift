@@ -7,6 +7,7 @@ let package = Package(
     products: [
         .library(name: "TrafficCore", targets: ["TrafficCore"]),
         .executable(name: "trafficlens-cli", targets: ["trafficlens-cli"]),
+        .executable(name: "TrafficLensApp", targets: ["TrafficLensApp"]),
     ],
     dependencies: [
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "6.29.0"),
@@ -23,6 +24,10 @@ let package = Package(
                 "TrafficCore",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
+        ),
+        .executableTarget(
+            name: "TrafficLensApp",
+            dependencies: ["TrafficCore"]
         ),
         .testTarget(
             name: "TrafficCoreTests",
