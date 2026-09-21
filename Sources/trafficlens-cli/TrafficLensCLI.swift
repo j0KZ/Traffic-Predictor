@@ -6,8 +6,15 @@ import TrafficCore
 struct TrafficLensCLI: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "trafficlens-cli",
-        abstract: "Compara ETA en vivo de varias fuentes sobre una ruta fija."
+        abstract: "Compara ETA en vivo de varias fuentes sobre una ruta fija.",
+        subcommands: [Sample.self, Reference.self, Calibrate.self],
+        // Sin subcomando se muestrea: mantiene la invocación de siempre.
+        defaultSubcommand: Sample.self
     )
+}
+
+struct Sample: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(abstract: "Corre rondas de muestreo y las persiste.")
 
     @Option(name: .long, help: "Ruta en JSON (origen, destino, waypoints, baseline).")
     var route: String = "route.json"
