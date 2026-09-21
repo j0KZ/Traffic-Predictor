@@ -63,6 +63,23 @@ public actor SampleStore {
         migrator.registerMigration("v2-traffic-coverage") { db in
             try db.execute(sql: "ALTER TABLE sample ADD COLUMN traffic_coverage REAL;")
         }
+        migrator.registerMigration("v3-reference") { db in
+            try db.execute(sql: """
+                CREATE TABLE IF NOT EXISTS reference (
+                    id          TEXT PRIMARY KEY,
+                    route_id    TEXT NOT NULL,
+                    source      TEXT NOT NULL,
+                    captured_at INTEGER NOT NULL,
+                    duration_s  INTEGER NOT NULL,
+                    distance_m  INTEGER,
+                    note        TEXT
+                );
+                """)
+            try db.execute(sql: """
+                CREATE INDEX IF NOT EXISTS idx_reference_route_time
+                    ON reference(route_id, captured_at);
+                """)
+        }
         try migrator.migrate(queue)
     }
 
@@ -160,6 +177,45 @@ public actor SampleStore {
                 severity: row["severity"],
                 routeRatio: row["route_ratio"]
             )
+        }
+    }
+
+    public func persist(_ reading: ReferenceReading) async throws {
+        try await dbQueue.write { db in
+            try db.execute(sql: """
+                INSERT OR REPLACE INTO reference
+                (id, route_id, source, captured_at, duration_s, distance_m, note)
+                VALUES (?, ?, ?, ?, ?, ?, ?);
+                """, arguments: [
+                    reading.id.uuidString, reading.routeID, reading.source,
+                    Int(reading.capturedAt.timeIntervalSince1970),
+                    reading.durationSeconds, reading.distanceMeters, reading.note,
+                ])
+        }
+    }
+
+    public func references(routeID: String, from: Date, to: Date) async throws -> [ReferenceReading] {
+        try await dbQueue.read { db in
+            let rows = try Row.fetchAll(db, sql: """
+                SELECT * FROM reference
+                WHERE route_id = ? AND captured_at BETWEEN ? AND ?
+                ORDER BY captured_at;
+                """, arguments: [routeID, Int(from.timeIntervalSince1970), Int(to.timeIntervalSince1970)])
+            return try rows.map { row in
+                let idString: String = row["id"]
+                guard let uuid = UUID(uuidString: idString) else {
+                    throw ProviderError.decoding("fila de reference corrupta: \(idString)")
+                }
+                return ReferenceReading(
+                    id: uuid,
+                    routeID: row["route_id"],
+                    source: row["source"],
+                    capturedAt: Date(timeIntervalSince1970: TimeInterval(row["captured_at"] as Int)),
+                    durationSeconds: row["duration_s"],
+                    distanceMeters: row["distance_m"],
+                    note: row["note"]
+                )
+            }
         }
     }
 
