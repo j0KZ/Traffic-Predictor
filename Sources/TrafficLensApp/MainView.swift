@@ -309,6 +309,8 @@ private struct RecoveryBar: View {
             return String(format: "Despeje proyectado %@ (R² %.2f)", Format.time(clear), r2)
         case .unclear(let reason):
             return "Sin estimación: \(reason)."
+        case .worsening(let slope) where slope < 0.5:
+            return "Sin estimación: el delay está estable, no hay tendencia a despejar."
         case .worsening(let slope):
             return String(format: "Sin estimación: el delay empeora a %.1f s/min.", slope)
         case .insufficient(let needed):

@@ -98,9 +98,10 @@ public enum DivergenceAnalyzer {
             .map(\.provider)
     }
 
-    /// Mediana baja para pares: con dos fuentes preferimos la conservadora.
+    /// Mediana alta para pares: con dos fuentes se toma la ETA mayor. La
+    /// menor es la optimista, y ese es justo el modo de falla a evitar.
     static func medianOf(_ sorted: [Int]) -> Int {
         guard !sorted.isEmpty else { return 0 }
-        return sorted[(sorted.count - 1) / 2]
+        return sorted[sorted.count / 2]
     }
 }

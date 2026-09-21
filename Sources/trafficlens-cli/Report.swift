@@ -137,6 +137,8 @@ enum Report {
         case .unclear(let reason):
             // Se dice por qué, en vez de mostrar un guion.
             out += "  Sin estimación: \(reason)\n"
+        case .worsening(let slope) where slope < 0.5:
+            out += "  Sin estimación: delay estable, sin tendencia a despejar\n"
         case .worsening(let slope):
             out += String(format: "  Sin estimación: empeorando a %.1f s/min\n", slope)
         case .insufficient(let needed):

@@ -47,8 +47,8 @@ final class DivergenceTests: XCTestCase {
             makeSample(.here,   duration: 8100),
         ])
         XCTAssertEqual(d.verdict, .consensus)
-        // Con dos fuentes se toma la baja: la conservadora.
-        XCTAssertEqual(d.median, 8000)
+        // Con dos fuentes se toma la mayor: la menor es la optimista.
+        XCTAssertEqual(d.median, 8100)
     }
 
     func testOneSourceIsInsufficient() {
@@ -72,7 +72,7 @@ final class DivergenceTests: XCTestCase {
             makeSample(.here,   duration: 9100, distance: 178_432),
         ])
         XCTAssertEqual(d.divergentRoutes, [.google])
-        XCTAssertEqual(d.median, 9000, "la mediana no debe contaminarse con la otra ruta")
+        XCTAssertEqual(d.median, 9100, "la mediana no debe contaminarse con la otra ruta")
         XCTAssertEqual(d.verdict, .consensus, "las dos que sí van por Ruta 5 concuerdan")
     }
 
@@ -120,7 +120,7 @@ final class ExpectedDistanceDivergenceTests: XCTestCase {
 
         XCTAssertTrue(d.divergentRoutes.isEmpty)
         XCTAssertEqual(d.verdict, .consensus)
-        XCTAssertEqual(d.median, 8900)
+        XCTAssertEqual(d.median, 9000)
     }
 
     func testSingleSourceOnTheWrongCorridorIsCaught() {
