@@ -22,12 +22,20 @@ public struct TaggedPair: Sendable, Equatable {
 }
 
 /// Corrige cada fuente hacia la referencia y las mezcla según qué tan bien
-/// vienen acertando. Con poca evidencia corrige poco: el factor de una
-/// ciudad se apoya en el de su franja, y el de la franja en "no corregir".
+/// vienen acertando. El sesgo es propio de cada ruta: el de otras ciudades
+/// no se traslada (probado dejando cada ciudad fuera), así que el factor de
+/// una franja se apoya en el de la misma ruta en otras franjas, y ese en
+/// "no corregir".
 public struct CalibrationModel: Sendable {
-    /// Pares que "valen" el apoyo del nivel superior. Con k pares propios,
-    /// el factor local pesa la mitad.
-    public static let shrinkage = 4.0
+    /// Pares que "valen" el apoyo del nivel superior. Bajo: con 1 lectura de
+    /// Waze el error de Mapbox corregido baja de 7.7% a 2.7% y con 2 a 1.6%
+    /// (63 pares, 17 rutas), así que la evidencia propia manda pronto.
+    public static let shrinkage = 0.25
+
+    /// Error supuesto de cada fuente sin historia propia. Mapbox crudo acierta
+    /// 7% en ciudades nunca vistas. TomTom falla peor y además en la punta
+    /// se dispara (x2 en Tel Aviv): sin historia pesa poco.
+    public static let priorError: [ProviderID: Double] = [.mapbox: 0.07, .tomtom: 0.35]
 
     private let pairs: [TaggedPair]
 
@@ -39,13 +47,13 @@ public struct CalibrationModel: Sendable {
     public func factor(provider: ProviderID, route: String, band: BandKey) -> Double {
         let own = pairs.filter { $0.provider == provider }
 
-        // Nivel franja: todas las rutas de esa franja, encogido hacia 0 (sin corregir).
-        let inBand = own.filter { $0.band == band }
-        let bandLog = Self.shrunkMean(inBand.map(\.logCorrection), toward: 0)
+        // Nivel ruta: todas las franjas de esa ruta, encogido hacia 0 (sin corregir).
+        let onRoute = own.filter { $0.route == route }
+        let routeLog = Self.shrunkMean(onRoute.map(\.logCorrection), toward: 0)
 
-        // Nivel ruta+franja: encogido hacia el de la franja.
-        let local = inBand.filter { $0.route == route }
-        let localLog = Self.shrunkMean(local.map(\.logCorrection), toward: bandLog)
+        // Nivel ruta+franja: encogido hacia el de la ruta.
+        let local = onRoute.filter { $0.band == band }
+        let localLog = Self.shrunkMean(local.map(\.logCorrection), toward: routeLog)
 
         return exp(localLog)
     }
@@ -54,8 +62,8 @@ public struct CalibrationModel: Sendable {
     /// nil sin pares propios: no hay con qué medirlo.
     public func residualError(provider: ProviderID, route: String, band: BandKey) -> Double? {
         let f = factor(provider: provider, route: route, band: band)
-        let local = pairs.filter { $0.provider == provider && $0.band == band }
-        let scoped = local.contains { $0.route == route } ? local.filter { $0.route == route } : local
+        let onRoute = pairs.filter { $0.provider == provider && $0.route == route }
+        let scoped = onRoute.contains { $0.band == band } ? onRoute.filter { $0.band == band } : onRoute
         guard !scoped.isEmpty else { return nil }
         let errors = scoped.map { abs(Double($0.pair.sample) * f - Double($0.pair.reference)) / Double(max($0.pair.reference, 1)) }
         return errors.reduce(0, +) / Double(errors.count)
@@ -69,8 +77,9 @@ public struct CalibrationModel: Sendable {
         var totalWeight = 0.0
         for (provider, duration) in samples {
             let corrected = Double(duration) * factor(provider: provider, route: route, band: band)
-            // Sin historia propia, peso neutro: no se premia ni castiga lo que no se midió.
-            let error = residualError(provider: provider, route: route, band: band) ?? 0.15
+            // Sin historia propia, el error típico de la fuente en rutas nuevas.
+            let error = residualError(provider: provider, route: route, band: band)
+                ?? Self.priorError[provider] ?? 0.15
             let weight = 1 / max(error, 0.02)
             weighted += corrected * weight
             totalWeight += weight

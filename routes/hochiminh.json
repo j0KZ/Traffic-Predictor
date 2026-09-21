@@ -1,0 +1,15 @@
+{
+  "id": "tansonnhat-d1",
+  "label": "tansonnhat-d1 (hochiminh)",
+  "origin": {
+    "lat": 10.818,
+    "lon": 106.659
+  },
+  "destination": {
+    "lat": 10.7769,
+    "lon": 106.7009
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Asia/Ho_Chi_Minh"
+}

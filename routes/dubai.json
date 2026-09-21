@@ -1,0 +1,15 @@
+{
+  "id": "deira-marina",
+  "label": "deira-marina (dubai)",
+  "origin": {
+    "lat": 25.269,
+    "lon": 55.32
+  },
+  "destination": {
+    "lat": 25.08,
+    "lon": 55.14
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Asia/Dubai"
+}

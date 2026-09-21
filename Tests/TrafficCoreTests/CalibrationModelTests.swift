@@ -28,13 +28,21 @@ final class CalibrationModelTests: XCTestCase {
         XCTAssertEqual(fMany, 0.5, accuracy: 0.1)
     }
 
-    func testRouteWithoutHistoryBorrowsItsBandFactor() {
-        // Estambul sin historia usa lo aprendido en la punta de otras ciudades.
+    func testOtherCitiesDoNotTransfer() {
+        // Lo aprendido en Tel Aviv no se aplica a Estambul: el sesgo es local.
         let model = CalibrationModel(pairs: (0..<12).map { pair(.tomtom, "tlv", peak, sample: 1400, ref: 1000, minute: Double($0) * 5) })
-        let borrowed = model.factor(provider: .tomtom, route: "ist", band: peak)
-        XCTAssertLessThan(borrowed, 1)
-        XCTAssertEqual(model.factor(provider: .tomtom, route: "ist", band: noon), 1, accuracy: 1e-9,
-                       "otra franja no hereda nada")
+        XCTAssertEqual(model.factor(provider: .tomtom, route: "ist", band: peak), 1, accuracy: 1e-9)
+    }
+
+    func testSameRouteOtherBandIsTheFallback() {
+        // Sin lecturas de mediodía, la ruta usa su propio factor de la punta.
+        let model = CalibrationModel(pairs: (0..<4).map { pair(.mapbox, "cl", peak, sample: 1000, ref: 1100, minute: Double($0) * 5) })
+        XCTAssertEqual(model.factor(provider: .mapbox, route: "cl", band: noon), 1.1, accuracy: 0.02)
+    }
+
+    func testOneReadingAlreadyCorrectsMost() {
+        let model = CalibrationModel(pairs: [pair(.mapbox, "cl", peak, sample: 1000, ref: 1200, minute: 0)])
+        XCTAssertEqual(model.factor(provider: .mapbox, route: "cl", band: peak), 1.2, accuracy: 0.05)
     }
 
     func testBlendFavorsTheSourceThatHasBeenRight() {

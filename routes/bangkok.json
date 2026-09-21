@@ -1,0 +1,15 @@
+{
+  "id": "silom-chatuchak",
+  "label": "silom-chatuchak (bangkok)",
+  "origin": {
+    "lat": 13.729,
+    "lon": 100.534
+  },
+  "destination": {
+    "lat": 13.8,
+    "lon": 100.553
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Asia/Bangkok"
+}

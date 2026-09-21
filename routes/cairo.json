@@ -1,0 +1,15 @@
+{
+  "id": "giza-heliopolis",
+  "label": "giza-heliopolis (cairo)",
+  "origin": {
+    "lat": 30.013,
+    "lon": 31.209
+  },
+  "destination": {
+    "lat": 30.088,
+    "lon": 31.33
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Africa/Cairo"
+}

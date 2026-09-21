@@ -8,7 +8,7 @@ public enum Calibrator {
     public static let maxPairingGap: TimeInterval = 300
     /// Por debajo de esta cantidad de pares el factor se informa pero no se
     /// ofrece como corrección.
-    public static let minimumPairsForCorrection = 8
+    public static let minimumPairsForCorrection = 2
     /// La referencia tiene que moverse al menos esto para que exista una
     /// curva que seguir. Con 16 s de variación de madrugada, una correlación
     /// de 1.00 es ruido de redondeo, no seguimiento.
@@ -37,7 +37,7 @@ public enum Calibrator {
         }
 
         /// ETA corregida por el factor. nil si no hay base suficiente:
-        /// una corrección con 2 pares es ruido con decimales.
+        /// con 1 par no se distingue sesgo de ruido.
         public func corrected(_ durationSeconds: Int) -> Int? {
             guard isUsableForCorrection, ratio > 0 else { return nil }
             return Int((Double(durationSeconds) / ratio).rounded())

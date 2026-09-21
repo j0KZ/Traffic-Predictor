@@ -1,0 +1,15 @@
+{
+  "id": "soweto-sandton",
+  "label": "soweto-sandton (johannesburgo)",
+  "origin": {
+    "lat": -26.2485,
+    "lon": 27.854
+  },
+  "destination": {
+    "lat": -26.1076,
+    "lon": 28.0567
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Africa/Johannesburg"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "parramatta-cbd",
+  "label": "parramatta-cbd (sidney)",
+  "origin": {
+    "lat": -33.815,
+    "lon": 151.001
+  },
+  "destination": {
+    "lat": -33.8688,
+    "lon": 151.2093
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Australia/Sydney"
+}

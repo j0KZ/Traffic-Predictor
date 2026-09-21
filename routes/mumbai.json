@@ -1,0 +1,15 @@
+{
+  "id": "andheri-bkc",
+  "label": "andheri-bkc (mumbai)",
+  "origin": {
+    "lat": 19.1197,
+    "lon": 72.8468
+  },
+  "destination": {
+    "lat": 19.066,
+    "lon": 72.868
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Asia/Kolkata"
+}

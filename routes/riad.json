@@ -1,0 +1,15 @@
+{
+  "id": "olaya-airport",
+  "label": "olaya-airport (riad)",
+  "origin": {
+    "lat": 24.69,
+    "lon": 46.685
+  },
+  "destination": {
+    "lat": 24.957,
+    "lon": 46.699
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Asia/Riyadh"
+}

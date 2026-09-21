@@ -1,0 +1,15 @@
+{
+  "id": "whitefield-mgroad",
+  "label": "whitefield-mgroad (bangalore)",
+  "origin": {
+    "lat": 12.9698,
+    "lon": 77.75
+  },
+  "destination": {
+    "lat": 12.9756,
+    "lon": 77.606
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Asia/Kolkata"
+}

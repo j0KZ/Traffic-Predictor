@@ -1,0 +1,15 @@
+{
+  "id": "jurong-raffles",
+  "label": "jurong-raffles (singapur)",
+  "origin": {
+    "lat": 1.333,
+    "lon": 103.742
+  },
+  "destination": {
+    "lat": 1.284,
+    "lon": 103.851
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibraci\u00f3n por features.",
+  "timeZone": "Asia/Singapore"
+}
