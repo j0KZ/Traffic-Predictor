@@ -54,37 +54,64 @@ public enum Calibrator {
 
         for (source, refs) in bySource.sorted(by: { $0.key < $1.key }) {
             for provider in ProviderID.allCases {
+                let pairs = self.pairs(provider: provider, samples: samples, references: refs, maxGap: maxGap)
+                guard let bias = summarize(provider: provider, source: source, pairs: pairs) else { continue }
+                result.append(bias)
+            }
+        }
+        return result
+    }
+
+    /// Pares de una fuente contra lecturas de referencia de UNA misma ruta.
+    public static func pairs(
+        provider: ProviderID,
+        samples: [ETASample],
+        references refs: [ReferenceReading],
+        maxGap: TimeInterval = maxPairingGap
+    ) -> [Pair] {
                 let own = samples.filter { $0.provider == provider }
-                guard !own.isEmpty else { continue }
+                guard !own.isEmpty else { return [] }
 
                 // Cada referencia se empareja con la muestra más cercana en
                 // el tiempo, y solo si está dentro del margen.
-                let pairs: [Pair] = refs.compactMap { ref in
+                return refs.compactMap { ref in
                     guard let nearest = own.min(by: {
                         abs($0.capturedAt.timeIntervalSince(ref.capturedAt))
                             < abs($1.capturedAt.timeIntervalSince(ref.capturedAt))
                     }), abs(nearest.capturedAt.timeIntervalSince(ref.capturedAt)) <= maxGap else {
                         return nil
                     }
+                    // Si la fuente tomó otra ruta que la referencia, sus tiempos
+                    // no son comparables: es otro viaje.
+                    if let refDistance = ref.distanceMeters, refDistance > 0 {
+                        let gap = abs(Double(nearest.distanceMeters - refDistance)) / Double(refDistance)
+                        guard gap <= DivergenceAnalyzer.distanceDivergenceRatio else { return nil }
+                    }
                     return Pair(sample: nearest.durationSeconds, reference: ref.durationSeconds, at: ref.capturedAt)
                 }.sorted { $0.at < $1.at }
+    }
 
-                guard !pairs.isEmpty else { continue }
+    /// Resume pares, que pueden venir de varias rutas. nil sin pares.
+    public static func summarize(provider: ProviderID, source: String, pairs: [Pair]) -> Bias? {
+        guard !pairs.isEmpty else { return nil }
+        let ratios = pairs.map { Double($0.sample) / Double(max($0.reference, 1)) }.sorted()
+        let offsets = pairs.map { $0.sample - $0.reference }.sorted()
+        return Bias(
+            provider: provider,
+            referenceSource: source,
+            pairs: pairs,
+            ratio: ratios[(ratios.count - 1) / 2],
+            offsetSeconds: offsets[(offsets.count - 1) / 2],
+            trendCorrelation: trend(pairs)
+        )
+    }
 
-                let ratios = pairs.map { Double($0.sample) / Double(max($0.reference, 1)) }.sorted()
-                let offsets = pairs.map { $0.sample - $0.reference }.sorted()
-
-                result.append(Bias(
-                    provider: provider,
-                    referenceSource: source,
-                    pairs: pairs,
-                    ratio: ratios[(ratios.count - 1) / 2],
-                    offsetSeconds: offsets[(offsets.count - 1) / 2],
-                    trendCorrelation: trend(pairs)
-                ))
-            }
-        }
-        return result
+    /// Error absoluto relativo mediano: cuánto se equivoca una fuente, sin
+    /// importar hacia qué lado. Es la medida de precisión por franja.
+    public static func medianAbsoluteError(_ pairs: [Pair]) -> Double? {
+        guard !pairs.isEmpty else { return nil }
+        let errors = pairs.map { abs(Double($0.sample - $0.reference)) / Double(max($0.reference, 1)) }.sorted()
+        return errors[(errors.count - 1) / 2]
     }
 
     static func trend(_ pairs: [Pair]) -> Double? {

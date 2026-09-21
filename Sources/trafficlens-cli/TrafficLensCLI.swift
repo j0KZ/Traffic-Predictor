@@ -7,7 +7,7 @@ struct TrafficLensCLI: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "trafficlens-cli",
         abstract: "Compara ETA en vivo de varias fuentes sobre una ruta fija.",
-        subcommands: [Sample.self, Reference.self, Calibrate.self],
+        subcommands: [Sample.self, Sweep.self, Reference.self, Calibrate.self],
         // Sin subcomando se muestrea: mantiene la invocación de siempre.
         defaultSubcommand: Sample.self
     )

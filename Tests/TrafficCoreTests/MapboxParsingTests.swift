@@ -92,10 +92,11 @@ final class MapboxParsingTests: XCTestCase {
 
     func testRateLimitCarriesRetryAfter() async {
         let client = StubHTTPClient(replies: [
-            .init(status: 429, data: Data(), headers: ["Retry-After": "5"])
+            .init(status: 429, data: Data(), headers: ["Retry-After": "30"])
         ])
+        // Un Retry-After largo es cuota, no límite por segundo: no se reintenta.
         await XCTAssertThrowsProviderError(try await provider(client).fetch(testQuery)) { error in
-            XCTAssertEqual(error, .rateLimited(retryAfter: 5))
+            XCTAssertEqual(error, .rateLimited(retryAfter: 30))
         }
     }
 

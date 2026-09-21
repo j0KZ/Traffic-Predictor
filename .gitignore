@@ -12,3 +12,5 @@ DerivedData/
 !.env.example
 Tests/TrafficCoreTests/Fixtures/live/
 .DS_Store
+calib-*.sqlite
+waze-compare.sqlite

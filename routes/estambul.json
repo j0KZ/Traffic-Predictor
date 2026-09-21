@@ -1,0 +1,15 @@
+{
+  "id": "kadikoy-levent",
+  "label": "Kadıköy a Levent (Estambul)",
+  "timeZone": "Europe/Istanbul",
+  "origin": {
+    "lat": 40.99,
+    "lon": 29.029
+  },
+  "destination": {
+    "lat": 41.082,
+    "lon": 29.011
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración multi-ciudad."
+}

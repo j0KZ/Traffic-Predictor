@@ -130,6 +130,16 @@ final class TomTomParsingTests: XCTestCase {
         XCTAssertTrue(sample.incidents.isEmpty)
     }
 
+    func testShortRetryAfterIsRetriedOnce() async throws {
+        // Límite por segundo con Retry-After: 1. Se espera y se reintenta.
+        let client = StubHTTPClient(replies: [
+            .init(status: 429, data: Data(), headers: ["Retry-After": "1"]),
+            .init(data: Fixtures.data("tomtom/route_happy.json")),
+        ], fallback: .init(data: Data("{}".utf8)))
+        let sample = try await provider(client).fetch(testQuery)
+        XCTAssertEqual(sample.durationSeconds, 8412)
+    }
+
     func testRouteRateLimitIsSurfaced() async {
         let client = StubHTTPClient(replies: [
             .init(status: 429, data: Data(), headers: ["Retry-After": "12"])

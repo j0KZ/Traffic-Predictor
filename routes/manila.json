@@ -1,0 +1,16 @@
+{
+  "id": "qc-makati-edsa",
+  "label": "SM North EDSA a Ayala, Makati (Manila), calibración con tráfico real",
+  "origin": {
+    "lat": 14.6566,
+    "lon": 121.0301
+  },
+  "destination": {
+    "lat": 14.5547,
+    "lon": 121.0244
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración en hora laboral de Asia. EDSA.",
+  "expectedDistanceMeters": 15600,
+  "timeZone": "Asia/Manila"
+}

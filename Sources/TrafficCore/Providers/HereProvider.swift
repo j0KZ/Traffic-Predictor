@@ -8,10 +8,18 @@ public struct HereProvider: TrafficProvider {
 
     private let client: HTTPClient
     private let credentials: CredentialStore
+    /// false ahorra la cuota de incidentes, la más escasa. Para calibrar
+    /// solo importa la ETA.
+    private let fetchIncidents: Bool
 
-    public init(client: HTTPClient = URLSessionHTTPClient(), credentials: CredentialStore = CredentialStore()) {
+    public init(
+        client: HTTPClient = URLSessionHTTPClient(),
+        credentials: CredentialStore = CredentialStore(),
+        fetchIncidents: Bool = true
+    ) {
         self.client = client
         self.credentials = credentials
+        self.fetchIncidents = fetchIncidents
     }
 
     public func fetch(_ query: RouteQuery) async throws -> ETASample {
@@ -21,6 +29,7 @@ public struct HereProvider: TrafficProvider {
         let routeData = try await client.fetchJSONBody(try routeRequest(query, key: key), provider: id)
         var sample = try parseRoute(routeData, capturedAt: capturedAt)
 
+        guard fetchIncidents else { return sample }
         let points = sample.polyline.map { Polyline.decode($0) } ?? []
         if let bbox = BoundingBox(points: points) {
             // Igual que en TomTom: sin causa seguimos teniendo ETA.

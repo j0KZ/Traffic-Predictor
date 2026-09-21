@@ -1,0 +1,16 @@
+{
+  "id": "pj-klcc",
+  "label": "Petaling Jaya a KLCC (Kuala Lumpur), calibración con tráfico real",
+  "origin": {
+    "lat": 3.118,
+    "lon": 101.621
+  },
+  "destination": {
+    "lat": 3.1579,
+    "lon": 101.7123
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración en hora laboral de Asia.",
+  "expectedDistanceMeters": 19000,
+  "timeZone": "Asia/Kuala_Lumpur"
+}

@@ -38,6 +38,19 @@ extension HTTPClient {
     /// Traduce el status en el error tipado que corresponde, o devuelve el cuerpo.
     /// Un 200 con cuerpo vacío es un fallo de decodificación, no un éxito.
     func fetchJSONBody(_ request: URLRequest, provider: ProviderID) async throws -> Data {
+        do {
+            return try await fetchOnce(request)
+        } catch ProviderError.rateLimited(let retryAfter?) where retryAfter <= Self.shortRetryLimit {
+            // Un Retry-After corto es un límite por segundo, no de cuota:
+            // esperar ese segundo cuesta menos que perder la muestra.
+            try await Task.sleep(nanoseconds: UInt64(retryAfter * 1_000_000_000))
+            return try await fetchOnce(request)
+        }
+    }
+
+    static var shortRetryLimit: TimeInterval { 5 }
+
+    private func fetchOnce(_ request: URLRequest) async throws -> Data {
         let (data, http) = try await send(request)
 
         switch http.statusCode {

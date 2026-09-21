@@ -18,5 +18,6 @@
   ],
   "freeFlowBaselineSeconds": 6300,
   "expectedDistanceMeters": 163000,
-  "notes": "Distancia medida 2026-09-20: TomTom 161.5 km, Mapbox 164.8 km. expectedDistanceMeters=163000 permite detectar ruteo por la costa aun con solo dos fuentes. OJO: el baseline de 6300s (1h45) implica 92 km/h de promedio; el free-flow que reporta TomTom para este corredor es 7244s (2h01, 80 km/h). El delay contra baseline sale inflado ~15 min. Revisar el dato del operador contra un viaje real antes de confiar en esa columna."
+  "notes": "Distancia medida 2026-09-20: TomTom 161.5 km, Mapbox 164.8 km. expectedDistanceMeters=163000 permite detectar ruteo por la costa aun con solo dos fuentes. OJO: el baseline de 6300s (1h45) implica 92 km/h de promedio; el free-flow que reporta TomTom para este corredor es 7244s (2h01, 80 km/h). El delay contra baseline sale inflado ~15 min. Revisar el dato del operador contra un viaje real antes de confiar en esa columna.",
+  "timeZone": "America/Santiago"
 }

@@ -1,0 +1,15 @@
+{
+  "id": "santamonica-dtla",
+  "label": "Santa Monica a Downtown LA",
+  "timeZone": "America/Los_Angeles",
+  "origin": {
+    "lat": 34.0195,
+    "lon": -118.4912
+  },
+  "destination": {
+    "lat": 34.0522,
+    "lon": -118.2437
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración multi-ciudad."
+}

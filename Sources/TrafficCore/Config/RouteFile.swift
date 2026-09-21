@@ -17,6 +17,10 @@ public struct RouteFile: Decodable, Sendable {
     public let freeFlowBaselineSeconds: Int?
     public let expectedDistanceMeters: Int?
     public let notes: String?
+    /// Zona horaria IANA de la ruta, para clasificar lecturas por franja.
+    public let timeZone: String?
+
+    public var zone: TimeZone { timeZone.flatMap(TimeZone.init(identifier:)) ?? .current }
 
     public func query() -> RouteQuery {
         RouteQuery(

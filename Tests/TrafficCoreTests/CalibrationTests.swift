@@ -82,6 +82,14 @@ final class CalibrationTests: XCTestCase {
         XCTAssertNil(tomtom.trendCorrelation)
     }
 
+    func testSampleOnADifferentRouteIsNotPaired() {
+        // Caso real en Kuala Lumpur: TomTom tomó 25.7 km y Waze 19.1 km.
+        let tomtom = ETASample(provider: .tomtom, capturedAt: base, durationSeconds: 1558, distanceMeters: 25_700)
+        let reference = ReferenceReading(routeID: "kl", source: "waze", capturedAt: base,
+                                         durationSeconds: 1808, distanceMeters: 19_100)
+        XCTAssertTrue(Calibrator.bias(samples: [tomtom], references: [reference]).isEmpty)
+    }
+
     func testReferenceRoundTripThroughStore() async throws {
         let store = try SampleStore.inMemory()
         let reading = waze(7620, at: 0)

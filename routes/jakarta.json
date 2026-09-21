@@ -1,0 +1,16 @@
+{
+  "id": "bekasi-bundaranhi",
+  "label": "Bekasi a Bundaran HI (Yakarta), calibración con tráfico real",
+  "origin": {
+    "lat": -6.2349,
+    "lon": 106.9896
+  },
+  "destination": {
+    "lat": -6.1951,
+    "lon": 106.823
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración: tráfico real en hora laboral de Asia mientras en Chile es de madrugada. Sin baseline del operador.",
+  "expectedDistanceMeters": 28700,
+  "timeZone": "Asia/Jakarta"
+}

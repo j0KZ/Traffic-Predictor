@@ -1,0 +1,15 @@
+{
+  "id": "raanana-azrieli",
+  "label": "Ra'anana a Azrieli (Tel Aviv)",
+  "timeZone": "Asia/Jerusalem",
+  "origin": {
+    "lat": 32.184,
+    "lon": 34.871
+  },
+  "destination": {
+    "lat": 32.074,
+    "lon": 34.792
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración multi-ciudad."
+}

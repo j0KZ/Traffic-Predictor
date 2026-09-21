@@ -1,0 +1,15 @@
+{
+  "id": "albany-cbd",
+  "label": "Albany a Auckland CBD",
+  "timeZone": "Pacific/Auckland",
+  "origin": {
+    "lat": -36.729,
+    "lon": 174.701
+  },
+  "destination": {
+    "lat": -36.8485,
+    "lon": 174.7633
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración multi-ciudad."
+}
