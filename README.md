@@ -32,6 +32,21 @@ Keys gratis: developer.tomtom.com y account.mapbox.com.
     # App macOS
     swift run TrafficLensApp
 
+## Lecturas de Waze automáticas (extensión de Brave/Chrome)
+
+Waze bloquea navegadores automatizados en servidor, pero no tu navegador
+normal. La extensión lee Waze en una pestaña de fondo cada 2 h (o al hacer
+clic en su ícono) y manda cada lectura a un receptor local, que además barre
+TomTom/Mapbox justo antes para que los pares queden dentro de 5 min.
+
+    set -a && source .env && set +a
+    python3 tools/waze-receiver.py --db calib-global.sqlite    # 127.0.0.1:8791
+
+Luego en `brave://extensions`: activar "Modo desarrollador", "Cargar
+descomprimida" y elegir `tools/waze-reader`. El navegador tiene que estar
+abierto y el receptor corriendo. Uso personal y de baja frecuencia: los
+términos de Waze no contemplan lectura automatizada.
+
 ## Lo aprendido calibrando (63 pares, 17 ciudades)
 
 - El sesgo de cada fuente es **propio de cada ruta**; no se traslada entre ciudades.

@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "TrafficLens Waze Reader",
+  "version": "1.0",
+  "description": "Lee el ETA de Waze para las rutas de TrafficLens y lo envía al receptor local.",
+  "permissions": ["alarms", "tabs", "scripting", "storage"],
+  "host_permissions": ["https://www.waze.com/*", "http://127.0.0.1:8791/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "TrafficLens: leer Waze ahora" }
+}
