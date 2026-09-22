@@ -65,6 +65,13 @@ struct Calibrate: AsyncParsableCommand {
                     }
                 }
             }
+            // Periodos ya podados: solo queda el coeficiente, pero basta
+            // para el factor.
+            for d in try await store.derivedPairs(routeID: file.id, from: from, to: to) {
+                tagged.append(TaggedPair(provider: d.provider, route: file.id,
+                                         band: .of(d.at, in: file.zone),
+                                         at: d.at, logCorrection: d.logRatio))
+            }
         }
 
         guard !tagged.isEmpty else {
@@ -80,7 +87,7 @@ struct Calibrate: AsyncParsableCommand {
             for provider in ProviderID.allCases {
                 let group = tagged.filter { $0.band == band && $0.provider == provider }
                 guard let bias = Calibrator.summarize(provider: provider, source: "waze",
-                                                     pairs: group.map(\.pair)),
+                                                     pairs: group.compactMap(\.pair)),
                       let mae = Calibrator.medianAbsoluteError(bias.pairs) else { continue }
                 let direction = bias.ratio < 1 ? "optimista" : "pesimista"
                 print("  " + Report.pad(band.label, 34) + Report.pad(provider.rawValue, 9)
@@ -96,7 +103,7 @@ struct Calibrate: AsyncParsableCommand {
             for provider in ProviderID.allCases {
                 let group = tagged.filter { $0.route == route && $0.provider == provider }
                 guard let bias = Calibrator.summarize(provider: provider, source: "waze",
-                                                     pairs: group.map(\.pair)) else { continue }
+                                                     pairs: group.compactMap(\.pair)) else { continue }
                 var line = "  " + Report.pad(route, 27) + Report.pad(provider.rawValue, 9)
                     + Report.pad("\(bias.pairs.count) par(es)", 12)
                     + Report.pad(String(format: "factor %.3f", bias.ratio), 15)

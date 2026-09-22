@@ -5,19 +5,32 @@ public struct TaggedPair: Sendable, Equatable {
     public let provider: ProviderID
     public let route: String
     public let band: BandKey
-    public let pair: Calibrator.Pair
+    public let at: Date
+    /// log(referencia / muestra): el factor que llevaría la fuente a Waze.
+    /// En logaritmo, pasarse un 20% y quedarse corto un 20% pesan igual.
+    public let logCorrection: Double
+    /// Los tiempos originales, mientras existan. Se pierden al podar: los
+    /// términos de Mapbox y TomTom no permiten guardar sus respuestas más
+    /// allá de la ventana corta, pero sí este cociente, que es nuestro.
+    public let pair: Calibrator.Pair?
 
     public init(provider: ProviderID, route: String, band: BandKey, pair: Calibrator.Pair) {
         self.provider = provider
         self.route = route
         self.band = band
+        self.at = pair.at
         self.pair = pair
+        self.logCorrection = log(Double(max(pair.reference, 1)) / Double(max(pair.sample, 1)))
     }
 
-    /// log(referencia / muestra): el factor que llevaría la fuente a Waze.
-    /// En logaritmo, pasarse un 20% y quedarse corto un 20% pesan igual.
-    var logCorrection: Double {
-        log(Double(max(pair.reference, 1)) / Double(max(pair.sample, 1)))
+    /// Par ya reducido a su coeficiente, sin los tiempos originales.
+    public init(provider: ProviderID, route: String, band: BandKey, at: Date, logCorrection: Double) {
+        self.provider = provider
+        self.route = route
+        self.band = band
+        self.at = at
+        self.pair = nil
+        self.logCorrection = logCorrection
     }
 }
 
@@ -65,7 +78,9 @@ public struct CalibrationModel: Sendable {
         let onRoute = pairs.filter { $0.provider == provider && $0.route == route }
         let scoped = onRoute.contains { $0.band == band } ? onRoute.filter { $0.band == band } : onRoute
         guard !scoped.isEmpty else { return nil }
-        let errors = scoped.map { abs(Double($0.pair.sample) * f - Double($0.pair.reference)) / Double(max($0.pair.reference, 1)) }
+        // |muestra·f − referencia| / referencia = |f / e^logCorrection − 1|,
+        // así que el coeficiente basta: no hacen falta los tiempos originales.
+        let errors = scoped.map { abs(f / exp($0.logCorrection) - 1) }
         return errors.reduce(0, +) / Double(errors.count)
     }
 
@@ -110,7 +125,7 @@ public enum CalibrationEvaluation {
     /// Deja fuera cada lectura. Optimista si las lecturas de una ruta están
     /// muy juntas en el tiempo: sus vecinas quedan en el entrenamiento.
     public static func leaveOneOut(_ pairs: [TaggedPair]) -> Result? {
-        evaluate(pairs) { "\($0.route)|\($0.pair.at.timeIntervalSince1970)" }
+        evaluate(pairs) { "\($0.route)|\($0.at.timeIntervalSince1970)" }
     }
 
     /// Deja fuera una ruta completa: el modelo solo sabe de otras ciudades
@@ -124,8 +139,15 @@ public enum CalibrationEvaluation {
     /// dejar una fuera se apoya en lecturas del futuro, que en la vida real
     /// no existen. Mide 7.4% contra 5.6% del optimista (74 lecturas).
     public static func forwardInTime(_ pairs: [TaggedPair]) -> Result? {
-        let events = Dictionary(grouping: pairs) { "\($0.route)|\($0.pair.at.timeIntervalSince1970)" }
-            .values.sorted { ($0.first?.pair.at ?? .distantPast) < ($1.first?.pair.at ?? .distantPast) }
+        let withTimes = pairs.filter { $0.pair != nil }
+        let grouped: [String: [TaggedPair]] = Dictionary(grouping: withTimes) {
+            "\($0.route)|\($0.at.timeIntervalSince1970)"
+        }
+        let events: [[TaggedPair]] = grouped.values.sorted {
+            let a: Date = $0.first?.at ?? .distantPast
+            let b: Date = $1.first?.at ?? .distantPast
+            return a < b
+        }
         guard events.count >= 2 else { return nil }
 
         var rawErrors: [ProviderID: [Double]] = [:]
@@ -133,8 +155,8 @@ public enum CalibrationEvaluation {
         var calibratedErrors: [Double] = []
 
         for (index, event) in events.enumerated() {
-            guard let first = event.first else { continue }
-            let reference = Double(first.pair.reference)
+            guard let first = event.first, let firstPair = first.pair else { continue }
+            let reference = Double(firstPair.reference)
             // Entrena con todo lo ocurrido antes de esta lectura.
             let training = events[..<index].flatMap { $0 }
             // Sin historia propia de la ruta no hay nada que evaluar: el
@@ -143,7 +165,8 @@ public enum CalibrationEvaluation {
             let model = CalibrationModel(pairs: training)
 
             var samples: [ProviderID: Int] = [:]
-            for p in event { samples[p.provider] = p.pair.sample }
+            for p in event { if let q = p.pair { samples[p.provider] = q.sample } }
+            guard !samples.isEmpty else { continue }
 
             for (provider, value) in samples {
                 rawErrors[provider, default: []].append(abs(Double(value) - reference) / reference)
@@ -168,7 +191,9 @@ public enum CalibrationEvaluation {
 
     private static func evaluate(_ pairs: [TaggedPair], holdout: (TaggedPair) -> String) -> Result? {
         // Un "evento" es una lectura de referencia: misma ruta y mismo instante.
-        let events = Dictionary(grouping: pairs) { "\($0.route)|\($0.pair.at.timeIntervalSince1970)" }
+        let events = Dictionary(grouping: pairs.filter { $0.pair != nil }) {
+            "\($0.route)|\($0.at.timeIntervalSince1970)"
+        }
         guard events.count >= 2 else { return nil }
 
         var rawErrors: [ProviderID: [Double]] = [:]
@@ -176,14 +201,15 @@ public enum CalibrationEvaluation {
         var calibratedErrors: [Double] = []
 
         for (_, event) in events {
-            guard let first = event.first else { continue }
-            let reference = Double(first.pair.reference)
+            guard let first = event.first, let firstPair = first.pair else { continue }
+            let reference = Double(firstPair.reference)
             let heldOut = holdout(first)
             let training = pairs.filter { holdout($0) != heldOut }
             let model = CalibrationModel(pairs: training)
 
             var samples: [ProviderID: Int] = [:]
-            for p in event { samples[p.provider] = p.pair.sample }
+            for p in event { if let q = p.pair { samples[p.provider] = q.sample } }
+            guard !samples.isEmpty else { continue }
 
             for (provider, value) in samples {
                 rawErrors[provider, default: []].append(abs(Double(value) - reference) / reference)

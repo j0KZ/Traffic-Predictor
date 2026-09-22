@@ -80,6 +80,23 @@ public actor SampleStore {
                     ON reference(route_id, captured_at);
                 """)
         }
+        migrator.registerMigration("v4-derived-pair") { db in
+            // Lo que sobrevive a la poda: el cociente, no la respuesta ajena.
+            try db.execute(sql: """
+                CREATE TABLE IF NOT EXISTS derived_pair (
+                    id           TEXT PRIMARY KEY,
+                    route_id     TEXT NOT NULL,
+                    provider     TEXT NOT NULL,
+                    captured_at  INTEGER NOT NULL,
+                    log_ratio    REAL NOT NULL,
+                    rel_error    REAL NOT NULL
+                );
+                """)
+            try db.execute(sql: """
+                CREATE INDEX IF NOT EXISTS idx_derived_route
+                    ON derived_pair(route_id, captured_at);
+                """)
+        }
         try migrator.migrate(queue)
     }
 
@@ -191,6 +208,24 @@ public actor SampleStore {
                     Int(reading.capturedAt.timeIntervalSince1970),
                     reading.durationSeconds, reading.distanceMeters, reading.note,
                 ])
+        }
+    }
+
+    /// Pares ya reducidos a su coeficiente, de periodos cuyas muestras
+    /// crudas se podaron.
+    public func derivedPairs(routeID: String, from: Date, to: Date) async throws -> [(provider: ProviderID, at: Date, logRatio: Double)] {
+        try await dbQueue.read { db in
+            let rows = try Row.fetchAll(db, sql: """
+                SELECT provider, captured_at, log_ratio FROM derived_pair
+                WHERE route_id = ? AND captured_at BETWEEN ? AND ?
+                ORDER BY captured_at;
+                """, arguments: [routeID, Int(from.timeIntervalSince1970), Int(to.timeIntervalSince1970)])
+            return rows.compactMap { row in
+                guard let provider = ProviderID(rawValue: row["provider"]) else { return nil }
+                return (provider,
+                        Date(timeIntervalSince1970: TimeInterval(row["captured_at"] as Int)),
+                        row["log_ratio"] as Double)
+            }
         }
     }
 
