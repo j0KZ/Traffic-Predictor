@@ -225,7 +225,7 @@ PAGE = """<!DOCTYPE html>
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", default="calib-global.sqlite")
-    ap.add_argument("--out", default="site")
+    ap.add_argument("--out", default="site/interno")
     ap.add_argument("--routes", default="routes")
     ap.add_argument("--extra", default="route.json")
     a = ap.parse_args()

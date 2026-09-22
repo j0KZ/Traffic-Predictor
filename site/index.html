@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ETA Check — Cuánto se equivoca tu tiempo de entrega</title>
+<meta name="description" content="Medimos la precisión de los tiempos de viaje que usa tu operación, corredor por corredor y hora por hora. Dos semanas sin costo.">
+<meta property="og:title" content="ETA Check">
+<meta property="og:description" content="Cuánto se equivoca tu ETA en la punta de la mañana, medido en tus propias rutas.">
+<style>
+  :root {
+    --bg: #fbfaf8; --surface: #fff; --text: #17171a; --muted: #67665f;
+    --line: #e7e3db; --accent: #b4491f; --accent-soft: #f5e7e0; --ok: #3f6f52;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141416; --surface: #1d1d20; --text: #ededea; --muted: #9c9a94;
+      --line: #313137; --accent: #e08b62; --accent-soft: #2a211d; --ok: #82b394;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141416; --surface: #1d1d20; --text: #ededea; --muted: #9c9a94;
+    --line: #313137; --accent: #e08b62; --accent-soft: #2a211d; --ok: #82b394;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 28px 0; border-bottom: 1px solid var(--line); }
+  .brand { font-weight: 650; letter-spacing: -.01em; font-size: 17px; }
+  .brand span { color: var(--accent); }
+
+  .hero { padding: 72px 0 56px; }
+  h1 {
+    font-size: clamp(30px, 6.2vw, 50px); line-height: 1.1; letter-spacing: -.025em;
+    margin: 0 0 20px; font-weight: 640;
+  }
+  .lead { font-size: clamp(18px, 2.4vw, 20px); color: var(--muted); margin: 0 0 32px; }
+  .btn {
+    display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+    padding: 14px 26px; border-radius: 9px; font-weight: 600; font-size: 16px;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn-note { display: block; margin-top: 12px; font-size: 14px; color: var(--muted); }
+
+  section { padding: 52px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(22px, 3.4vw, 28px); letter-spacing: -.02em; margin: 0 0 18px; font-weight: 640; }
+  h3 { font-size: 17px; margin: 0 0 6px; font-weight: 640; }
+  p { margin: 0 0 18px; }
+  p:last-child { margin-bottom: 0; }
+
+  .cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 28px 0 8px; }
+  .cifra { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .cifra b { display: block; font-size: 30px; font-weight: 650; letter-spacing: -.02em; color: var(--accent); line-height: 1.1; }
+  .cifra span { display: block; margin-top: 8px; font-size: 14.5px; color: var(--muted); }
+
+  ol.pasos { counter-reset: p; list-style: none; padding: 0; margin: 0; }
+  ol.pasos li {
+    counter-increment: p; position: relative; padding: 0 0 26px 52px;
+    border-left: 2px solid var(--line); margin-left: 15px;
+  }
+  ol.pasos li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  ol.pasos li::before {
+    content: counter(p); position: absolute; left: -16px; top: -2px;
+    width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft);
+    color: var(--accent); font-weight: 650; font-size: 15px;
+    display: grid; place-items: center; border: 1px solid var(--line);
+  }
+
+  .entrega { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 26px; }
+  .entrega ul { margin: 0; padding-left: 20px; }
+  .entrega li { margin-bottom: 10px; }
+  .entrega li:last-child { margin-bottom: 0; }
+
+  .faq details {
+    border-bottom: 1px solid var(--line); padding: 16px 0;
+  }
+  .faq details:last-of-type { border-bottom: none; }
+  .faq summary { cursor: pointer; font-weight: 600; list-style: none; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::before { content: "+ "; color: var(--accent); font-weight: 650; }
+  .faq details[open] summary::before { content: "− "; }
+  .faq p { margin: 12px 0 0; color: var(--muted); }
+
+  .cierre { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 34px 28px; text-align: center; margin-bottom: 8px; }
+  .cierre h2 { margin-bottom: 10px; }
+  .cierre p { color: var(--muted); margin-bottom: 24px; }
+
+  footer { padding: 34px 0 60px; color: var(--muted); font-size: 14px; }
+  footer a { color: var(--muted); }
+  .fuentes { font-size: 13.5px; color: var(--muted); margin-top: 22px; }
+  .fuentes a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap brand">ETA<span>Check</span></div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>¿Cuánto se equivoca tu tiempo de entrega en la punta de la mañana?</h1>
+    <p class="lead">Medimos la precisión de los tiempos de viaje que usa tu operación, corredor por
+       corredor y franja por franja. Dos semanas, sin costo y sin compromiso.</p>
+    <a class="btn" href="mailto:contacto@etacheck.cl?subject=Quiero%20medir%20mi%20corredor">Medir mi corredor</a>
+    <span class="btn-note">Respondemos el mismo día. No necesitas instalar nada.</span>
+  </div>
+
+  <section>
+    <h2>El problema no es que el ETA falle. Es que falla distinto a cada hora.</h2>
+    <p>Un proveedor de ruteo puede acertar al 2% de madrugada y equivocarse 20% a las ocho de la mañana,
+       en el mismo corredor. Si tu operación promete ventanas horarias, ese error se paga en reintentos,
+       en reprogramaciones y en llamados al call center.</p>
+    <div class="cifras">
+      <div class="cifra"><b>15–25%</b><span>de las entregas en Latinoamérica falla en el primer intento</span></div>
+      <div class="cifra"><b>US$3–10</b><span>cuesta cada intento fallido</span></div>
+      <div class="cifra"><b>30–55%</b><span>del costo total de envío se va en la última milla</span></div>
+    </div>
+    <p class="fuentes">Fuentes: estudio de Capgemini sobre entregas fallidas, recopilado por
+       <a href="https://mercado.com.ar/tendencias/entregas-fallidas-y-ultima-milla-el-costo-operativo-de-la-logistica-de-excepciones/">Revista Mercado</a>;
+       participación de la última milla en el costo de envío según
+       <a href="https://kaizen.com/es/insights-es/last-mile-optimizar-cadena-suministro/">Kaizen Institute</a>.</p>
+  </section>
+
+  <section>
+    <h2>Cómo funciona</h2>
+    <ol class="pasos">
+      <li>
+        <h3>Nos dices tu corredor</h3>
+        <p>Origen, destino y el horario en que operan esa ruta. Nada más.</p>
+      </li>
+      <li>
+        <h3>Medimos cada 30 minutos, dos semanas</h3>
+        <p>Consultamos el tiempo de viaje de forma continua y armamos la curva completa del corredor:
+           cómo se comporta a cada hora y cada día de la semana.</p>
+      </li>
+      <li>
+        <h3>Contrastamos con tus viajes reales</h3>
+        <p>Si nos compartes los tiempos de algunos viajes ya hechos —hora de salida y duración, un CSV
+           basta— el informe pasa de describir el corredor a medir el error exacto de tu proveedor actual.</p>
+      </li>
+      <li>
+        <h3>Te entregamos el informe y el factor de corrección</h3>
+        <p>Cuánto se equivoca, en qué franjas, y por cuánto multiplicar cada predicción para acercarla
+           a la realidad de tu ruta.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Qué recibes</h2>
+    <div class="entrega">
+      <ul>
+        <li><strong>Error por franja horaria</strong>, no un promedio que esconde la punta.</li>
+        <li><strong>Factor de corrección por corredor</strong>, listo para aplicar sobre tu ETA actual.</li>
+        <li><strong>Ventana de promesa recomendada</strong>: qué margen aguanta ese corredor sin incumplir.</li>
+        <li><strong>Cuánto cuesta el error de hoy</strong>, calculado con tu volumen y tu costo por atraso.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Por qué creerle a la medición</h2>
+    <p>Hoy seguimos 25 corredores urbanos en distintas ciudades del mundo, medidos cada 30 minutos.
+       Sobre esa base construimos la corrección y la validamos de la forma honesta: entrenando solo
+       con el pasado y prediciendo la medición siguiente, nunca dejando datos del futuro en el
+       entrenamiento.</p>
+    <div class="cifras">
+      <div class="cifra"><b>12,7%</b><span>error del proveedor sin corregir</span></div>
+      <div class="cifra"><b>6,3%</b><span>error una vez calibrado el corredor</span></div>
+      <div class="cifra"><b>2</b><span>mediciones reales bastan para fijar el factor</span></div>
+    </div>
+    <p style="margin-top:22px">Dicho con la misma honestidad: la corrección solo sirve en corredores
+       medidos. El sesgo es propio de cada ruta y no se traslada de una ciudad a otra, ni siquiera de
+       una avenida a la de al lado. Por eso medimos los tuyos y no te vendemos un promedio ajeno.</p>
+  </section>
+
+  <section class="faq">
+    <h2>Preguntas</h2>
+    <details>
+      <summary>¿Tengo que compartir datos de mi operación?</summary>
+      <p>Para el perfil del corredor, no: basta el origen y el destino. Para medir el error exacto de tu
+         proveedor sí necesitamos tiempos reales de viajes ya hechos. Mientras más, mejor, pero con
+         veinte o treinta ya se ve el sesgo.</p>
+    </details>
+    <details>
+      <summary>¿Con qué proveedor comparan?</summary>
+      <p>Medimos con fuentes comerciales de ruteo en vivo y, cuando existe, contra los tiempos reales
+         de tu flota, que es la única verdad que importa. En el informe verás el error de la fuente que
+         tú ya usas.</p>
+    </details>
+    <details>
+      <summary>¿Cuánto cuesta?</summary>
+      <p>Las dos semanas de medición no tienen costo. Si el error que encontramos te importa y quieres
+         la auditoría completa o el monitoreo continuo, ahí conversamos precio. Si no, te quedas con el
+         dato.</p>
+    </details>
+    <details>
+      <summary>¿Tengo que integrar algo?</summary>
+      <p>No. No tocamos tu sistema, no instalamos nada y no necesitamos acceso a tus plataformas.</p>
+    </details>
+  </section>
+
+  <section style="border-top:none; padding-top:16px">
+    <div class="cierre">
+      <h2>Empecemos por la ruta que más te duele</h2>
+      <p>Dinos cuál es y en dos semanas sabrás exactamente cuánto se equivoca.</p>
+      <a class="btn" href="mailto:contacto@etacheck.cl?subject=Quiero%20medir%20mi%20corredor&amp;body=Corredor%20(origen%20y%20destino)%3A%0AHorario%20de%20operaci%C3%B3n%3A%0AViajes%20por%20d%C3%ADa%3A%0A">Escribir a contacto@etacheck.cl</a>
+    </div>
+  </section>
+
+  <footer>
+    ETA Check · Medición independiente de precisión de ETA ·
+    <a href="mailto:contacto@etacheck.cl">contacto@etacheck.cl</a>
+  </footer>
+
+</div>
+</body>
+</html>
