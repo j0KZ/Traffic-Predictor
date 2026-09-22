@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El método — ETA Check</title>
+<meta name="description" content="Cómo medimos la precisión de un ETA: emparejamiento, filtros, el factor de corrección y la validación hacia adelante. Método abierto.">
+<style>
+  :root {
+    --bg: #fbfaf8; --surface: #fff; --text: #17171a; --muted: #67665f;
+    --line: #e7e3db; --accent: #b4491f; --accent-soft: #f5e7e0; --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141416; --surface: #1d1d20; --text: #ededea; --muted: #9c9a94;
+      --line: #313137; --accent: #e08b62; --accent-soft: #2a211d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141416; --surface: #1d1d20; --text: #ededea; --muted: #9c9a94;
+    --line: #313137; --accent: #e08b62; --accent-soft: #2a211d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 28px 0; border-bottom: 1px solid var(--line); display: flex;
+           justify-content: space-between; align-items: center; gap: 16px; }
+  .brand { font-weight: 650; font-size: 17px; text-decoration: none; color: var(--text); }
+  .brand span { color: var(--accent); }
+  header a.volver { color: var(--muted); text-decoration: none; font-size: 15px; }
+  header a.volver:hover { color: var(--accent); }
+
+  h1 { font-size: clamp(28px, 5.4vw, 42px); line-height: 1.12; letter-spacing: -.025em;
+       margin: 56px 0 18px; font-weight: 640; }
+  .lead { font-size: 19px; color: var(--muted); margin: 0 0 12px; }
+  section { padding: 44px 0; border-top: 1px solid var(--line); }
+  section:first-of-type { border-top: none; }
+  h2 { font-size: clamp(20px, 3vw, 25px); letter-spacing: -.02em; margin: 0 0 16px; font-weight: 640; }
+  h3 { font-size: 17px; margin: 26px 0 8px; font-weight: 640; }
+  p { margin: 0 0 16px; }
+  p:last-child { margin-bottom: 0; }
+  ul { margin: 0 0 16px; padding-left: 22px; }
+  li { margin-bottom: 8px; }
+  code { font: 15px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+         background: var(--accent-soft); padding: 2px 6px; border-radius: 5px; }
+  .formula { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+             padding: 18px 20px; font: 16px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
+             overflow-x: auto; margin: 0 0 18px; }
+  .nota { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+          border-radius: 0 var(--radius) var(--radius) 0; padding: 18px 20px; margin: 0 0 18px; }
+  .nota strong { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 15.5px; margin: 0 0 18px; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--muted); font-weight: 600; padding: 0 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 8px; border-bottom: 1px solid var(--line); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  footer { padding: 34px 0 60px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <a class="brand" href="/">ETA<span>Check</span></a>
+  <a class="volver" href="/">← Volver</a>
+</header>
+
+<div class="wrap">
+
+  <h1>El método, completo y abierto</h1>
+  <p class="lead">Un número sin método no sirve para tomar decisiones. Acá está exactamente cómo
+     medimos, qué descartamos y cómo nos validamos. Si encuentras un error, escríbenos.</p>
+
+  <section>
+    <h2>1. Qué se mide contra qué</h2>
+    <p>Un ETA se juzga contra una referencia. Usamos dos, en este orden de preferencia:</p>
+    <ul>
+      <li><strong>Tus viajes reales.</strong> Hora de salida y duración efectiva. Es la única verdad
+          y manda sobre cualquier otra cosa.</li>
+      <li><strong>Una fuente de tráfico en vivo independiente</strong> de la que usa tu operación,
+          cuando todavía no hay viajes reales con qué comparar.</li>
+    </ul>
+    <p>Cada corredor se consulta cada 30 minutos, de forma continua, para tener la curva completa
+       del día y no una foto conveniente.</p>
+  </section>
+
+  <section>
+    <h2>2. Cuándo dos mediciones se pueden comparar</h2>
+    <p>Un par es una predicción y una observación del mismo viaje. Para que cuente exigimos dos cosas:</p>
+    <ul>
+      <li><strong>Menos de 5 minutos de diferencia</strong> entre ambas. El tráfico cambia en minutos;
+          comparar a media hora de distancia es comparar dos días distintos.</li>
+      <li><strong>Menos de 6% de diferencia en distancia.</strong> Si la predicción tomó otro camino
+          que el viaje real, sus tiempos no son comparables: es otro viaje.</li>
+    </ul>
+    <div class="nota">
+      <p><strong>Por qué importa el segundo filtro:</strong> un par mal emparejado no se nota en el
+         resultado, se aprende como si fuera sesgo. Al apretar ese umbral de 15% a 6%, la dispersión
+         dentro de una misma ruta bajó de 6,6% a 6,0%, perdiendo solo 8 pares de 99.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. El factor de corrección</h2>
+    <p>Para cada par calculamos el cociente entre lo observado y lo predicho, en logaritmo:</p>
+    <div class="formula">coeficiente = log(tiempo real / tiempo predicho)</div>
+    <p>En logaritmo, pasarse un 20% y quedarse corto un 20% pesan igual, que es lo correcto: un ETA
+       optimista y uno pesimista cuestan distinto, pero se equivocan lo mismo.</p>
+    <p>El factor de una ruta y franja es el promedio de esos coeficientes, encogido hacia el nivel
+       superior cuando hay poca evidencia: la franja se apoya en el resto de la ruta, y la ruta en
+       "no corregir". Así una sola medición no arrastra la corrección a un extremo.</p>
+
+    <h3>Cuántas mediciones hacen falta</h3>
+    <table>
+      <thead><tr><th>Mediciones previas de esa ruta</th><th class="num">Error al predecir la siguiente</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td class="num">13,1%</td></tr>
+        <tr><td>2</td><td class="num">5,8%</td></tr>
+        <tr><td>3 o más</td><td class="num">5,7%</td></tr>
+      </tbody>
+    </table>
+    <p>La segunda medición es la que vale. La tercera casi no aporta. Por eso el piloto dura dos
+       semanas y no dos meses.</p>
+  </section>
+
+  <section>
+    <h2>4. Cómo nos validamos</h2>
+    <p>La trampa habitual en este tipo de medición es evaluar el modelo con datos que ya vio. Nosotros
+       reportamos la métrica honesta: <strong>entrenar solo con el pasado y predecir la medición
+       siguiente</strong>, que es exactamente lo que ocurre en producción.</p>
+    <table>
+      <thead><tr><th>Forma de validar</th><th class="num">Error calibrado</th></tr></thead>
+      <tbody>
+        <tr><td>Hacia adelante en el tiempo (la que reportamos)</td><td class="num">6,3%</td></tr>
+        <tr><td>Dejando una medición fuera (optimista)</td><td class="num">5,5%</td></tr>
+        <tr><td>Sin corregir, fuente cruda</td><td class="num">11,9%</td></tr>
+      </tbody>
+    </table>
+    <div class="nota">
+      <p><strong>Y el límite, dicho por nosotros:</strong> en un corredor nunca medido, calibrar no
+         sirve de nada (12,0% contra 12,7% sin corregir). El sesgo es propio de cada ruta y no se
+         traslada entre ciudades. Cualquiera que te venda un factor genérico te está vendiendo humo.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>5. Lo que probamos y descartamos</h2>
+    <p>Publicamos también lo que no funcionó, porque ahorra tiempo a quien quiera replicar esto:</p>
+    <ul>
+      <li><strong>Ponderar por antigüedad.</strong> Vidas medias de 30 minutos a 12 horas. Con dos o
+          más mediciones, ponderar empeora o da igual.</li>
+      <li><strong>Usar la congestión como variable.</strong> La correlación entre nivel de congestión
+          y sesgo dentro de una ruta es +0,14, o sea nada.</li>
+      <li><strong>Forzar la ruta con puntos intermedios</strong> para que coincida con el camino real.
+          Once variantes probadas, todas peores que dejar que el ruteo elija.</li>
+      <li><strong>Ajustar la fuerza del encogimiento.</strong> Barrimos de 0,1 a 2,0 y el óptimo estaba
+          donde ya estaba.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Qué hacemos con los datos</h2>
+    <ul>
+      <li><strong>Tus viajes son tuyos.</strong> No los publicamos, no los revendemos y no los usamos
+          para calibrar rutas de otro cliente.</li>
+      <li><strong>No republicamos datos de terceros.</strong> Las respuestas de los proveedores de
+          ruteo no se almacenan más allá de la ventana necesaria: de cada par se conserva el
+          coeficiente, que es un número nuestro, y la respuesta original se borra.</li>
+      <li><strong>El método es abierto; los datos, no.</strong> Esta página existe para que puedas
+          auditar cómo calculamos, sin que eso exponga a nadie.</li>
+    </ul>
+  </section>
+
+</div>
+
+<footer class="wrap">
+  ETA Check · <a href="/">Inicio</a> ·
+  <a href="mailto:contacto@etacheck.cl">contacto@etacheck.cl</a>
+</footer>
+
+</body>
+</html>

@@ -32,8 +32,13 @@
   }
   .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
   header { padding: 28px 0; border-bottom: 1px solid var(--line); }
-  .brand { font-weight: 650; letter-spacing: -.01em; font-size: 17px; }
+  .nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .brand { font-weight: 650; letter-spacing: -.01em; font-size: 17px;
+           text-decoration: none; color: var(--text); }
   .brand span { color: var(--accent); }
+  nav a { color: var(--muted); text-decoration: none; font-size: 15px; margin-left: 18px; }
+  nav a:hover { color: var(--accent); }
+  @media (max-width: 480px) { nav a { margin: 0 18px 0 0; } }
 
   .hero { padding: 72px 0 56px; }
   h1 {
@@ -100,7 +105,13 @@
 <body>
 
 <header>
-  <div class="wrap brand">ETA<span>Check</span></div>
+  <div class="wrap nav">
+    <a class="brand" href="/">ETA<span>Check</span></a>
+    <nav>
+      <a href="/metodo.html">El método</a>
+      <a href="/ejemplo.html">Informe de ejemplo</a>
+    </nav>
+  </div>
 </header>
 
 <div class="wrap">
@@ -156,6 +167,7 @@
 
   <section>
     <h2>Qué recibes</h2>
+    <p><a href="/ejemplo.html" style="color:var(--accent)">Mira un informe de ejemplo →</a></p>
     <div class="entrega">
       <ul>
         <li><strong>Error por franja horaria</strong>, no un promedio que esconde la punta.</li>
@@ -180,6 +192,7 @@
     <p style="margin-top:22px">Dicho con la misma honestidad: la corrección solo sirve en corredores
        medidos. El sesgo es propio de cada ruta y no se traslada de una ciudad a otra, ni siquiera de
        una avenida a la de al lado. Por eso medimos los tuyos y no te vendemos un promedio ajeno.</p>
+    <p><a href="/metodo.html" style="color:var(--accent)">El método completo, paso a paso →</a></p>
   </section>
 
   <section class="faq">
@@ -218,6 +231,8 @@
 
   <footer>
     ETA Check · Medición independiente de precisión de ETA ·
+    <a href="/metodo.html">El método</a> ·
+    <a href="/ejemplo.html">Informe de ejemplo</a> ·
     <a href="mailto:contacto@etacheck.cl">contacto@etacheck.cl</a>
   </footer>
 

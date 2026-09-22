@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informe de ejemplo — ETA Check</title>
+<meta name="description" content="Cómo se ve el informe que entregamos: error por franja horaria, factor de corrección y el costo del error actual.">
+<style>
+  :root {
+    --bg: #fbfaf8; --surface: #fff; --text: #17171a; --muted: #67665f;
+    --line: #e7e3db; --accent: #b4491f; --accent-soft: #f5e7e0;
+    --alto: #b5352a; --bajo: #3f6f52; --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141416; --surface: #1d1d20; --text: #ededea; --muted: #9c9a94;
+      --line: #313137; --accent: #e08b62; --accent-soft: #2a211d;
+      --alto: #e8776b; --bajo: #82b394;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141416; --surface: #1d1d20; --text: #ededea; --muted: #9c9a94;
+    --line: #313137; --accent: #e08b62; --accent-soft: #2a211d;
+    --alto: #e8776b; --bajo: #82b394;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 28px 0; border-bottom: 1px solid var(--line); display: flex;
+           justify-content: space-between; align-items: center; gap: 16px; }
+  .brand { font-weight: 650; font-size: 17px; text-decoration: none; color: var(--text); }
+  .brand span { color: var(--accent); }
+  header a.volver { color: var(--muted); text-decoration: none; font-size: 15px; }
+
+  .aviso { background: var(--accent-soft); border: 1px solid var(--line); border-radius: var(--radius);
+           padding: 16px 20px; margin: 28px 0 0; font-size: 15.5px; }
+  .aviso strong { color: var(--accent); }
+
+  h1 { font-size: clamp(27px, 5vw, 38px); line-height: 1.14; letter-spacing: -.025em;
+       margin: 34px 0 10px; font-weight: 640; }
+  .sub { color: var(--muted); margin: 0 0 34px; }
+  .hero { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+          padding: 26px; margin-bottom: 16px; }
+  .hero .big { font-size: clamp(38px, 8vw, 56px); font-weight: 650; letter-spacing: -.03em;
+               line-height: 1; color: var(--alto); }
+  .hero .big.verde { color: var(--bajo); }
+  .hero p { margin: 12px 0 0; color: var(--muted); }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .dos { grid-template-columns: 1fr; } }
+
+  section { padding: 44px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(20px, 3vw, 25px); letter-spacing: -.02em; margin: 0 0 16px; font-weight: 640; }
+  p { margin: 0 0 16px; } p:last-child { margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 15.5px; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--muted); font-weight: 600; padding: 0 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 8px; border-bottom: 1px solid var(--line); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .alto { color: var(--alto); font-weight: 650; }
+  .bajo { color: var(--bajo); font-weight: 650; }
+  .cierre { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+            padding: 32px 28px; text-align: center; }
+  .btn { display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+         padding: 13px 24px; border-radius: 9px; font-weight: 600; }
+  footer { padding: 34px 0 60px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  footer a { color: var(--muted); }
+  @media (max-width: 560px) { table { font-size: 14px; } td, th { padding: 10px 5px; } }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <a class="brand" href="/">ETA<span>Check</span></a>
+  <a class="volver" href="/">← Volver</a>
+</header>
+
+<div class="wrap">
+
+  <div class="aviso">
+    <strong>Informe de ejemplo.</strong> Las cifras de esta página son ilustrativas y sirven para
+    mostrar el formato del entregable. No publicamos mediciones reales de clientes ni datos de
+    proveedores de ruteo: el informe que recibes lleva tus corredores y tus números.
+  </div>
+
+  <h1>Auditoría de ETA · Distribuidora de ejemplo</h1>
+  <p class="sub">Corredor bodega Pudahuel → centro de Santiago · 14 días de medición ·
+     412 viajes reales comparados</p>
+
+  <div class="dos">
+    <div class="hero">
+      <div class="big">14,8%</div>
+      <p>de error medio del proveedor actual contra los viajes reales de la flota.</p>
+    </div>
+    <div class="hero">
+      <div class="big verde">3,2%</div>
+      <p>de error una vez aplicado el factor de corrección por franja.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Dónde está el error</h2>
+    <p>El promedio esconde el problema. Desglosado por franja horaria se ve que la operación de la
+       mañana es la que rompe las ventanas de entrega:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Franja</th><th class="num">Viajes</th><th class="num">Error actual</th>
+          <th class="num">Factor</th><th class="num">Error corregido</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Madrugada (00–06)</td><td class="num">38</td><td class="num alto">4,1%</td><td class="num">1,02</td><td class="num bajo">2,6%</td></tr>
+        <tr><td>Punta mañana (06–10)</td><td class="num">121</td><td class="num alto">22,7%</td><td class="num">1,26</td><td class="num bajo">4,4%</td></tr>
+        <tr><td>Mediodía (10–16)</td><td class="num">146</td><td class="num alto">11,3%</td><td class="num">1,11</td><td class="num bajo">3,1%</td></tr>
+        <tr><td>Punta tarde (16–20)</td><td class="num">89</td><td class="num alto">19,4%</td><td class="num">1,21</td><td class="num bajo">3,8%</td></tr>
+        <tr><td>Noche (20–24)</td><td class="num">18</td><td class="num alto">6,2%</td><td class="num">1,05</td><td class="num bajo">2,9%</td></tr>
+      </tbody>
+    </table>
+    <p>El proveedor es optimista de forma sistemática en la punta: promete 40 minutos donde el camión
+       se demora 49. Multiplicar esa franja por 1,26 deja el error en 4,4%.</p>
+  </section>
+
+  <section>
+    <h2>Qué cuesta eso hoy</h2>
+    <p>Con 800 entregas diarias y un costo de $2.500 por entrega que hay que reprogramar, el error
+       actual explica unas <strong>59 entregas tarde al día</strong>. Con el ETA corregido bajan a 13.</p>
+    <div class="hero">
+      <div class="big">$3.450.000</div>
+      <p>al mes en entregas que dejarían de llegar tarde. El cálculo asume que el error se reparte por
+         igual entre adelantarse y atrasarse, que es la lectura conservadora.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Qué hacer con esto</h2>
+    <p><strong>Inmediato:</strong> aplicar el factor por franja sobre el ETA que ya entrega tu sistema.
+       Es una multiplicación, no una integración: no hay que cambiar de proveedor ni tocar el ruteo.</p>
+    <p><strong>Ventana de promesa:</strong> en la punta de la mañana este corredor aguanta una promesa
+       de 55 minutos con 90% de cumplimiento. Prometer 45 es incumplir uno de cada tres.</p>
+    <p><strong>Seguimiento:</strong> el factor se mueve con las estaciones y con las obras en la vía.
+       Recalcularlo cada trimestre, o mantener la medición corriendo, evita que se desactualice.</p>
+  </section>
+
+  <section>
+    <div class="cierre">
+      <h2>Tu informe con tus rutas</h2>
+      <p>Dos semanas de medición, sin costo. Solo necesitamos el origen, el destino y el horario.</p>
+      <a class="btn" href="mailto:contacto@etacheck.cl?subject=Quiero%20medir%20mi%20corredor">Escribir a contacto@etacheck.cl</a>
+    </div>
+  </section>
+
+</div>
+
+<footer class="wrap">
+  ETA Check · <a href="/metodo.html">El método</a> ·
+  <a href="mailto:contacto@etacheck.cl">contacto@etacheck.cl</a>
+</footer>
+
+</body>
+</html>
