@@ -29,10 +29,19 @@ from email.message import EmailMessage
 CARPETAS = ["Leads/Nuevo", "Leads/Midiendo", "Leads/Informe", "Leads/Cerrado"]
 
 # Señales de que alguien quiere la medición. El modelo decide mejor, pero
-# esto tiene que funcionar igual si Ollama está caído.
+# esto tiene que funcionar igual si Ollama está caído. Pide dos señales:
+# una sola palabra suelta convierte cualquier aviso de Google en "lead".
 PALABRAS_LEAD = [
-    "medici", "corredor", "ruta", "eta", "entrega", "flota", "reparto",
-    "tiempo de viaje", "auditor", "cotiza", "informaci", "interesa",
+    "medici", "corredor", "eta", "entrega", "flota", "reparto", "despacho",
+    "tiempo de viaje", "ruta", "auditor", "cotiza", "última milla",
+    "ultima milla", "logística", "logistica", "operaci",
+]
+
+# Remitentes automáticos: nunca son un lead, aunque hablen de "cuenta" o
+# "seguridad". Se descartan antes de mirar el texto.
+REMITENTES_IGNORADOS = [
+    "no-reply", "noreply", "no_reply", "notification", "notify",
+    "mailer-daemon", "postmaster", "accounts.google.com", "@google.com",
 ]
 
 PROMPT = """Clasifica este correo en UNA categoría:
@@ -114,11 +123,14 @@ def clasificar(asunto, remitente, cuerpo):
             return r["categoria"], r.get("empresa", ""), r.get("resumen", "")
     except Exception as e:
         print(f"  (ollama no disponible: {e.__class__.__name__}; uso reglas)", file=sys.stderr)
+    if any(x in remitente.lower() for x in REMITENTES_IGNORADOS):
+        return "otro", "", ""
     texto = f"{asunto} {cuerpo}".lower()
     if re.search(r"\b-?\d{1,2}\.\d{3,},\s*-?\d{1,3}\.\d{3,}", texto) or ".csv" in texto:
         return "datos", "", "trae coordenadas o un archivo de viajes"
-    if any(p in texto for p in PALABRAS_LEAD):
-        return "lead", "", "consulta por el servicio"
+    hits = [p for p in PALABRAS_LEAD if p in texto]
+    if len(hits) >= 2:
+        return "lead", "", f"menciona {', '.join(hits[:3])}"
     return "otro", "", ""
 
 
