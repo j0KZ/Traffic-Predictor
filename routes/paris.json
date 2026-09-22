@@ -1,0 +1,9 @@
+{
+  "id": "ladefense-bastille",
+  "label": "ladefense-bastille (paris)",
+  "origin": { "lat": 48.8920, "lon": 2.2360 },
+  "destination": { "lat": 48.8530, "lon": 2.3690 },
+  "waypoints": [],
+  "notes": "Ruta de calibracion por features.",
+  "timeZone": "Europe/Paris"
+}

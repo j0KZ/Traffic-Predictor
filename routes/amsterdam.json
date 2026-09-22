@@ -1,0 +1,9 @@
+{
+  "id": "zuidoost-centraal",
+  "label": "zuidoost-centraal (amsterdam)",
+  "origin": { "lat": 52.3120, "lon": 4.9470 },
+  "destination": { "lat": 52.3791, "lon": 4.9003 },
+  "waypoints": [],
+  "notes": "Ruta de calibracion por features.",
+  "timeZone": "Europe/Amsterdam"
+}

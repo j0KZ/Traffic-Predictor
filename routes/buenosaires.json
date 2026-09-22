@@ -1,0 +1,15 @@
+{
+  "id": "sanisidro-obelisco",
+  "label": "sanisidro-obelisco (buenos aires)",
+  "origin": {
+    "lat": -34.4708,
+    "lon": -58.5078
+  },
+  "destination": {
+    "lat": -34.6037,
+    "lon": -58.3816
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración por features.",
+  "timeZone": "America/Argentina/Buenos_Aires"
+}

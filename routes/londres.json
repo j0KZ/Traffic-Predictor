@@ -1,0 +1,9 @@
+{
+  "id": "heathrow-city",
+  "label": "heathrow-city (londres)",
+  "origin": { "lat": 51.4700, "lon": -0.4543 },
+  "destination": { "lat": 51.5155, "lon": -0.0922 },
+  "waypoints": [],
+  "notes": "Ruta de calibracion por features.",
+  "timeZone": "Europe/London"
+}

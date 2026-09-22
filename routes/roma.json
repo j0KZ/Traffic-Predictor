@@ -1,0 +1,9 @@
+{
+  "id": "eur-termini",
+  "label": "eur-termini (roma)",
+  "origin": { "lat": 41.8340, "lon": 12.4700 },
+  "destination": { "lat": 41.9010, "lon": 12.5020 },
+  "waypoints": [],
+  "notes": "Ruta de calibracion por features.",
+  "timeZone": "Europe/Rome"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "guarulhos-paulista",
+  "label": "guarulhos-paulista (saopablo)",
+  "origin": { "lat": -23.4356, "lon": -46.4731 },
+  "destination": { "lat": -23.5614, "lon": -46.6559 },
+  "waypoints": [],
+  "notes": "Ruta de calibracion por features.",
+  "timeZone": "America/Sao_Paulo"
+}

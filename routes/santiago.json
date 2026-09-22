@@ -1,0 +1,15 @@
+{
+  "id": "maipu-lascondes",
+  "label": "maipu-lascondes (santiago)",
+  "origin": {
+    "lat": -33.511,
+    "lon": -70.758
+  },
+  "destination": {
+    "lat": -33.4089,
+    "lon": -70.568
+  },
+  "waypoints": [],
+  "notes": "Ruta de calibración por features.",
+  "timeZone": "America/Santiago"
+}
