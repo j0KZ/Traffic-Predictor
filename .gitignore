@@ -14,3 +14,6 @@ Tests/TrafficCoreTests/Fixtures/live/
 .DS_Store
 calib-*.sqlite
 waze-compare.sqlite
+site/
+reports/
+.tmp/
