@@ -119,6 +119,53 @@ public enum CalibrationEvaluation {
         evaluate(pairs) { $0.route }
     }
 
+    /// Predice cada lectura usando SOLO las anteriores en el tiempo. Es la
+    /// única forma de saber si el factor sirve para la próxima medición:
+    /// dejar una fuera se apoya en lecturas del futuro, que en la vida real
+    /// no existen. Mide 7.4% contra 5.6% del optimista (74 lecturas).
+    public static func forwardInTime(_ pairs: [TaggedPair]) -> Result? {
+        let events = Dictionary(grouping: pairs) { "\($0.route)|\($0.pair.at.timeIntervalSince1970)" }
+            .values.sorted { ($0.first?.pair.at ?? .distantPast) < ($1.first?.pair.at ?? .distantPast) }
+        guard events.count >= 2 else { return nil }
+
+        var rawErrors: [ProviderID: [Double]] = [:]
+        var medianErrors: [Double] = []
+        var calibratedErrors: [Double] = []
+
+        for (index, event) in events.enumerated() {
+            guard let first = event.first else { continue }
+            let reference = Double(first.pair.reference)
+            // Entrena con todo lo ocurrido antes de esta lectura.
+            let training = events[..<index].flatMap { $0 }
+            // Sin historia propia de la ruta no hay nada que evaluar: el
+            // factor sería 1 y mediríamos la fuente cruda, no la calibración.
+            guard training.contains(where: { $0.route == first.route }) else { continue }
+            let model = CalibrationModel(pairs: training)
+
+            var samples: [ProviderID: Int] = [:]
+            for p in event { samples[p.provider] = p.pair.sample }
+
+            for (provider, value) in samples {
+                rawErrors[provider, default: []].append(abs(Double(value) - reference) / reference)
+            }
+            let sorted = samples.values.sorted()
+            medianErrors.append(abs(Double(sorted[sorted.count / 2]) - reference) / reference)
+
+            if let predicted = model.predict(samples: samples, route: first.route, band: first.band) {
+                calibratedErrors.append(abs(Double(predicted) - reference) / reference)
+            }
+        }
+
+        func mean(_ xs: [Double]) -> Double { xs.isEmpty ? 0 : xs.reduce(0, +) / Double(xs.count) }
+        guard !calibratedErrors.isEmpty else { return nil }
+        return Result(
+            readings: calibratedErrors.count,
+            rawError: rawErrors.mapValues(mean),
+            rawMedianError: mean(medianErrors),
+            calibratedError: mean(calibratedErrors)
+        )
+    }
+
     private static func evaluate(_ pairs: [TaggedPair], holdout: (TaggedPair) -> String) -> Result? {
         // Un "evento" es una lectura de referencia: misma ruta y mismo instante.
         let events = Dictionary(grouping: pairs) { "\($0.route)|\($0.pair.at.timeIntervalSince1970)" }

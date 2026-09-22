@@ -75,4 +75,22 @@ final class CalibrationModelTests: XCTestCase {
     func testLeaveOneOutNeedsTwoReadings() {
         XCTAssertNil(CalibrationEvaluation.leaveOneOut([pair(.tomtom, "r", peak, sample: 1, ref: 1, minute: 0)]))
     }
+
+    func testForwardInTimeUsesOnlyThePast() {
+        // Sesgo estable: Mapbox marca 20% menos que Waze. Prediciendo hacia
+        // adelante debe aprenderlo y ganarle a la fuente cruda.
+        var pairs: [TaggedPair] = []
+        for i in 0..<10 {
+            pairs.append(pair(.mapbox, "r", peak, sample: 800, ref: 1000, minute: Double(i) * 60))
+        }
+        let result = try! XCTUnwrap(CalibrationEvaluation.forwardInTime(pairs))
+        XCTAssertEqual(result.readings, 9, "la primera no se puede predecir: no hay pasado")
+        XCTAssertLessThan(result.calibratedError, result.rawError[.mapbox] ?? 1)
+    }
+
+    func testForwardInTimeSkipsRoutesWithoutHistory() {
+        // Cada lectura es de otra ruta: nunca hay pasado propio que usar.
+        let pairs = (0..<4).map { pair(.mapbox, "r\($0)", peak, sample: 800, ref: 1000, minute: Double($0) * 60) }
+        XCTAssertNil(CalibrationEvaluation.forwardInTime(pairs))
+    }
 }

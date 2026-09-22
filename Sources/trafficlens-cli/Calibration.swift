@@ -112,6 +112,9 @@ struct Calibrate: AsyncParsableCommand {
         printEvaluation("¿Calibrar acerca a Waze en una ciudad ya medida? (dejando una lectura fuera)",
                         note: "Optimista: las lecturas vecinas de la misma ruta quedan en el entrenamiento.",
                         CalibrationEvaluation.leaveOneOut(tagged))
+        printEvaluation("¿Y para la PRÓXIMA medición? (solo con lecturas anteriores)",
+                        note: "La medida honesta: entrena con el pasado, predice el futuro.",
+                        CalibrationEvaluation.forwardInTime(tagged))
         printEvaluation("¿Y en una ciudad nueva? (dejando la ruta completa fuera)",
                         note: "Solo usa lo aprendido en otras ciudades de la misma franja.",
                         CalibrationEvaluation.leaveOneRouteOut(tagged))

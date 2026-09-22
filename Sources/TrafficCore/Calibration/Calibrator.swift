@@ -9,6 +9,12 @@ public enum Calibrator {
     /// Por debajo de esta cantidad de pares el factor se informa pero no se
     /// ofrece como corrección.
     public static let minimumPairsForCorrection = 2
+    /// Diferencia de distancia tolerada entre muestra y referencia. Más
+    /// estricto que el de DivergenceAnalyzer, que solo informa: acá un par
+    /// mal emparejado no se ve, se aprende como sesgo. Medido sobre 99
+    /// pares, apretar de 0.15 a 0.06 baja la dispersión dentro de la ruta
+    /// de 6.6% a 6.0% y solo descarta 8.
+    public static let maxDistanceGap = 0.06
     /// La referencia tiene que moverse al menos esto para que exista una
     /// curva que seguir. Con 16 s de variación de madrugada, una correlación
     /// de 1.00 es ruido de redondeo, no seguimiento.
@@ -85,7 +91,7 @@ public enum Calibrator {
                     // no son comparables: es otro viaje.
                     if let refDistance = ref.distanceMeters, refDistance > 0 {
                         let gap = abs(Double(nearest.distanceMeters - refDistance)) / Double(refDistance)
-                        guard gap <= DivergenceAnalyzer.distanceDivergenceRatio else { return nil }
+                        guard gap <= maxDistanceGap else { return nil }
                     }
                     return Pair(sample: nearest.durationSeconds, reference: ref.durationSeconds, at: ref.capturedAt)
                 }.sorted { $0.at < $1.at }
