@@ -146,7 +146,43 @@
   </section>
 
   <section>
-    <h2>5. Lo que probamos y descartamos</h2>
+    <h2>5. La prueba contra viajes reales, y lo que salió mal</h2>
+    <p>Todo lo anterior compara una predicción contra otra fuente. Eso deja una pregunta abierta:
+       ¿cuánto se equivocan contra el reloj? Chicago publica cada viaje de taxi —hora, duración
+       exacta y distancia, sin persona detrás— así que la pregunta se puede contestar.</p>
+    <p>Tomamos 200 viajes reales de más de 25 minutos en 8 corredores, y a cada proveedor le
+       pedimos su predicción para ese mismo instante.</p>
+    <table>
+      <thead><tr><th>Contra viajes reales</th><th class="num">Fuente A</th><th class="num">Fuente B</th></tr></thead>
+      <tbody>
+        <tr><td>Error medio</td><td class="num">12,6%</td><td class="num">14,8%</td></tr>
+        <tr><td>Sesgo: prometen menos tiempo del real</td><td class="num">6,2%</td><td class="num">8,6%</td></tr>
+        <tr><td>Viajes que tardaron más que lo prometido</td><td class="num">69%</td><td class="num">64%</td></tr>
+        <tr><td>Margen necesario para cumplir el 90%</td><td class="num">×1,33</td><td class="num">×1,48</td></tr>
+      </tbody>
+    </table>
+    <p>El sesgo es sistemático: <strong>en los ocho corredores, sin excepción, el tiempo real fue
+       mayor que el predicho</strong>, entre 3% y 15%. Un ETA crudo no es una estimación pareja, es
+       una promesa optimista siete de cada diez veces.</p>
+    <div class="nota">
+      <p><strong>Y acá está lo que no funcionó.</strong> Aplicar nuestro factor por corredor sobre
+         estos viajes <em>no bajó el error medio</em>: 12,3% sin corregir contra 13,6% corregido.
+         La razón es que la dispersión dentro de un mismo corredor (11% a 22%) es mayor que el
+         sesgo (6% a 9%). El factor recentra —los viajes que llegan tarde bajan de 69% a 41%— pero
+         no aprieta la distribución, porque corrige sesgo y no varianza.</p>
+    </div>
+    <p>La consecuencia honesta: el 6,3% de la sección anterior mide <em>concordancia con otra
+       fuente</em>, no exactitud contra la realidad. Contra el reloj, en un viaje urbano de media
+       hora, el piso está alrededor de 10% a 13% y ningún factor lo mueve mucho. Quien te prometa
+       bajar de ahí no ha medido contra viajes reales.</p>
+    <p><strong>Lo que sí vale, entonces, no es el ETA corregido: es el margen.</strong> Saber que
+       este corredor necesita ×1,33 para cumplir el 90% —y no el ×1,15 que se suele asumir ni el
+       ×1,6 que regala tiempo— es una cifra que se mide y que nadie te está midiendo. Eso es lo que
+       entregamos.</p>
+  </section>
+
+  <section>
+    <h2>6. Lo que probamos y descartamos</h2>
     <p>Publicamos también lo que no funcionó, porque ahorra tiempo a quien quiera replicar esto:</p>
     <ul>
       <li><strong>Ponderar por antigüedad.</strong> Vidas medias de 30 minutos a 12 horas. Con dos o
@@ -157,11 +193,13 @@
           Once variantes probadas, todas peores que dejar que el ruteo elija.</li>
       <li><strong>Ajustar la fuerza del encogimiento.</strong> Barrimos de 0,1 a 2,0 y el óptimo estaba
           donde ya estaba.</li>
+      <li><strong>Corregir el ETA para bajar el error medio contra viajes reales.</strong> No baja:
+          la varianza dentro del corredor es mayor que el sesgo. Está medido arriba.</li>
     </ul>
   </section>
 
   <section>
-    <h2>6. Qué hacemos con los datos</h2>
+    <h2>7. Qué hacemos con los datos</h2>
     <ul>
       <li><strong>Tus viajes son tuyos.</strong> No los publicamos, no los revendemos y no los usamos
           para calibrar rutas de otro cliente.</li>
