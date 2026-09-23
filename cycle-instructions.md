@@ -42,6 +42,7 @@ casi no aporta.
 ## 3. Refrescar las cifras públicas
 
     tools/build-santiago.py
+    tools/build-estudio.py     # solo si se ampliaron los viajes reales
 
 Si las cifras se movieron, commitear `site/santiago.html` y hacer push: el
 sitio se republica solo con el push. **Si el titular cambia de corredor o de
