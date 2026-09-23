@@ -4,17 +4,20 @@ Cifras en pesos chilenos, a septiembre de 2026. Dólar a $950.
 
 ## 1. Lo que cuesta hoy operar
 
-| Ítem | Mensual |
+| Ítem | Costo |
 |---|---|
-| Dominio `etacheck.cl` | ~$1.000 (anual repartido) |
+| Dominio `etacheck.cl` | $10.000, ya pagado, se renueva una vez al año |
 | Sitio en Cloudflare Workers | $0 |
 | Correo: Cloudflare Routing + Gmail + Brevo | $0 |
 | APIs de ruteo, dentro del tramo gratis | $0 |
 | Servidor | $0, es el que ya tienes |
-| **Total** | **~$1.000** |
+| **Salida de caja mensual** | **$0** |
 
-No hay costo fijo que justificar. Esto importa: no existe punto de equilibrio
-que alcanzar, el primer peso que entre es margen.
+No hay costo mensual. El dominio ya está pagado y el próximo desembolso es su
+renovación, en un año. Repartirlo en doce cuotas es contabilidad, no una
+cuenta que llegue: mientras nadie cobre nada, mantener esto andando cuesta
+cero. No existe punto de equilibrio que alcanzar, el primer peso que entre es
+margen.
 
 ## 2. Costo marginal por corredor
 

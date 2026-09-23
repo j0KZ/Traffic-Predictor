@@ -1,0 +1,15 @@
+{
+  "id": "quilicura-maipu",
+  "label": "Quilicura a Maipú (santiago)",
+  "origin": {
+    "lat": -33.3672,
+    "lon": -70.7292
+  },
+  "destination": {
+    "lat": -33.511,
+    "lon": -70.758
+  },
+  "waypoints": [],
+  "notes": "Corredor de bodegas a comuna densa por Americo Vespucio poniente. Punto a nivel de comuna, que es la unidad con que se cotiza el despacho en Chile.",
+  "timeZone": "America/Santiago"
+}

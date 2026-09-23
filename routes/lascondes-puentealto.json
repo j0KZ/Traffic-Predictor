@@ -1,0 +1,15 @@
+{
+  "id": "lascondes-puentealto",
+  "label": "Las Condes a Puente Alto (santiago)",
+  "origin": {
+    "lat": -33.4089,
+    "lon": -70.5680
+  },
+  "destination": {
+    "lat": -33.6118,
+    "lon": -70.5758
+  },
+  "waypoints": [],
+  "notes": "Reparto de norte a sur oriente, el que mas se atrasa en la punta. Punto a nivel de comuna, que es la unidad con que se cotiza el despacho en Chile.",
+  "timeZone": "America/Santiago"
+}

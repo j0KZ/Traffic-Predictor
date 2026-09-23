@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Santiago medido — ETA Check</title>
+<meta name="description" content="Cuánto se contradicen dos fuentes de tiempo de viaje en corredores de Santiago, medido cada 30 minutos y desglosado por franja horaria.">
+<link rel="canonical" href="https://etacheck.cl/santiago">
+<style>
+  :root {
+    --bg: #fbfaf8; --surface: #fff; --text: #17171a; --muted: #67665f;
+    --line: #e7e3db; --accent: #b4491f; --accent-soft: #f5e7e0;
+    --alto: #b5352a; --medio: #b07d1a; --bajo: #3f6f52; --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141416; --surface: #1d1d20; --text: #ededea; --muted: #9c9a94;
+      --line: #313137; --accent: #e08b62; --accent-soft: #2a211d;
+      --alto: #e8776b; --medio: #d4a955; --bajo: #82b394;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141416; --surface: #1d1d20; --text: #ededea; --muted: #9c9a94;
+    --line: #313137; --accent: #e08b62; --accent-soft: #2a211d;
+    --alto: #e8776b; --medio: #d4a955; --bajo: #82b394;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 28px 0; border-bottom: 1px solid var(--line); display: flex;
+           justify-content: space-between; align-items: center; gap: 16px; }
+  .brand { font-weight: 650; font-size: 17px; text-decoration: none; color: var(--text); }
+  .brand span { color: var(--accent); }
+  header a.volver { color: var(--muted); text-decoration: none; font-size: 15px; }
+  .eyebrow { color: var(--accent); font-size: 13px; letter-spacing: .08em;
+             text-transform: uppercase; font-weight: 600; margin: 40px 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.13; letter-spacing: -.025em;
+       margin: 0 0 14px; font-weight: 640; }
+  .lead { font-size: 19px; color: var(--muted); margin: 0 0 32px; max-width: 62ch; }
+  .hero { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+          padding: 26px; margin-bottom: 14px; }
+  .hero .big { font-size: clamp(38px, 8vw, 56px); font-weight: 650; letter-spacing: -.03em;
+               line-height: 1; color: var(--alto); }
+  .hero p { margin: 12px 0 0; color: var(--muted); }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+           gap: 12px; margin-bottom: 40px; }
+  .stat { background: var(--surface); border: 1px solid var(--line);
+          border-radius: 10px; padding: 16px; }
+  .stat b { display: block; font-size: 25px; font-weight: 650; letter-spacing: -.02em; }
+  .stat span { font-size: 13px; color: var(--muted); }
+  section { padding: 40px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(20px, 3vw, 25px); letter-spacing: -.02em; margin: 0 0 16px; font-weight: 640; }
+  p { margin: 0 0 16px; } p:last-child { margin-bottom: 0; }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 620px; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .05em;
+       color: var(--muted); font-weight: 600; padding: 0 8px 10px;
+       border-bottom: 1px solid var(--line); vertical-align: bottom; }
+  th span { display: block; font-size: 11px; letter-spacing: 0; text-transform: none; opacity: .75; }
+  td { padding: 13px 8px; border-bottom: 1px solid var(--line); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 650; }
+  td.muted { color: var(--muted); font-weight: 400; }
+  .alto { color: var(--alto); } .medio { color: var(--medio); } .bajo { color: var(--bajo); }
+  .nulo { color: var(--muted); font-weight: 400; }
+  .nota { background: var(--surface); border: 1px solid var(--line);
+          border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0;
+          padding: 18px 20px; margin: 0 0 18px; }
+  .nota strong { color: var(--accent); }
+  .cierre { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+            padding: 32px 28px; text-align: center; }
+  .btn { display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+         padding: 13px 24px; border-radius: 9px; font-weight: 600; }
+  footer { padding: 34px 0 60px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <a class="brand" href="/">ETA<span>Check</span></a>
+  <a class="volver" href="/">← Volver</a>
+</header>
+
+<div class="wrap">
+
+  <p class="eyebrow">Medición en curso · septiembre 2026</p>
+  <h1>Santiago, medido cada 30 minutos</h1>
+  <p class="lead">Consultamos el mismo trayecto, en el mismo instante, a dos de las fuentes de
+     tiempo de viaje más usadas del mercado. Cuando las dos no coinciden, al menos una le está
+     mintiendo a la operación que la usa. Esto es lo que llevamos medido.</p>
+
+  <div class="hero">
+    <div class="big">15,2%</div>
+    <p>de desacuerdo mediano en la punta de la tarde, contra 5,7% en la madrugada.
+       El mismo trayecto, la misma ciudad, distinta hora.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>14,0%</b><span>desacuerdo mediano</span></div>
+    <div class="stat"><b>20,9%</b><span>el peor caso registrado</span></div>
+    <div class="stat"><b>1</b><span>corredor con datos</span></div>
+    <div class="stat"><b>31</b><span>comparaciones simultáneas</span></div>
+  </div>
+
+  <section>
+    <h2>Corredor por corredor, franja por franja</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Corredor</th><th class="num">Comp.</th><th class="num">Madrugada<span>00–06</span></th><th class="num">Punta mañana<span>06–10</span></th><th class="num">Mediodía<span>10–16</span></th><th class="num">Punta tarde<span>16–20</span></th><th class="num">Noche<span>20–24</span></th></tr></thead>
+        <tbody>
+      <tr><td><strong>Maipú a Las Condes</strong></td><td class="num muted">31</td><td class="num bajo">5,7%</td><td class="num medio">13,3%</td><td class="num medio">12,2%</td><td class="num alto">15,2%</td><td class="num medio">14,2%</td></tr>
+      <tr><td><strong>Las Condes a Puente Alto</strong></td><td class="num muted">0</td><td class="nulo" colspan="5">recién dado de alta, midiendo</td></tr>
+      <tr><td><strong>Pudahuel (ENEA) a Puente Alto</strong></td><td class="num muted">0</td><td class="nulo" colspan="5">recién dado de alta, midiendo</td></tr>
+      <tr><td><strong>Quilicura a Maipú</strong></td><td class="num muted">0</td><td class="nulo" colspan="5">recién dado de alta, midiendo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Qué es y qué no es esta cifra</h2>
+    <div class="nota">
+      <p><strong>No es error, es desacuerdo.</strong> Mide cuánto se separan dos fuentes entre sí,
+         no cuánto se equivoca alguna contra la realidad. Es un límite inferior del problema: si
+         dos fuentes difieren 15%, al menos una se equivoca en algo cercano a eso, pero para saber
+         cuál hace falta el tiempo real del viaje. Eso es lo que medimos con cada cliente.</p>
+    </div>
+    <p>La cifra de cada celda es la mediana de las comparaciones de esa franja, no el promedio: una
+       medición rara no la mueve. La columna "Comp." es cuántas comparaciones simultáneas lleva ese
+       corredor, y conviene mirarla: con pocas, la celda es una señal, no un resultado.</p>
+    <p>Los puntos son a nivel de comuna, que es la unidad con la que se cotiza el despacho en Chile.
+       En tu operación el origen es una bodega concreta, y ahí las cifras cambian: por eso el informe
+       se hace sobre tus corredores y no sobre estos.</p>
+    <p>No nombramos a las dos fuentes ni publicamos ninguna respuesta suya. Lo que se publica acá es
+       un agregado calculado por nosotros. El método completo está en
+       <a href="/metodo">etacheck.cl/metodo</a>.</p>
+  </section>
+
+  <section>
+    <div class="cierre">
+      <h2>¿Y en tus corredores?</h2>
+      <p>Dime una comuna donde más te reclamen y mido ese corredor dos semanas, sin costo.
+         Te mando el desglose por hora como esta tabla, pero con tus rutas.</p>
+      <a class="btn" href="mailto:contacto@etacheck.cl?subject=Quiero%20medir%20mi%20corredor">Escribir a contacto@etacheck.cl</a>
+    </div>
+  </section>
+
+</div>
+
+<footer class="wrap">
+  Actualizado el 23-09-2026 01:54 · <a href="/metodo">El método</a> ·
+  <a href="/ejemplo">Informe de ejemplo</a> ·
+  <a href="mailto:contacto@etacheck.cl">contacto@etacheck.cl</a>
+</footer>
+
+</body>
+</html>

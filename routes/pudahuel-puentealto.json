@@ -1,0 +1,15 @@
+{
+  "id": "pudahuel-puentealto",
+  "label": "Pudahuel (ENEA) a Puente Alto (santiago)",
+  "origin": {
+    "lat": -33.3897,
+    "lon": -70.7900
+  },
+  "destination": {
+    "lat": -33.6118,
+    "lon": -70.5758
+  },
+  "waypoints": [],
+  "notes": "Bodegas del parque industrial ENEA hacia la comuna con mas entregas de ecommerce. Cruza la ciudad completa. Punto a nivel de comuna, que es la unidad con que se cotiza el despacho en Chile.",
+  "timeZone": "America/Santiago"
+}
