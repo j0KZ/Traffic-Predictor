@@ -1,0 +1,4 @@
+# Dominios a los que ya les escribimos. Una respuesta de acá es un lead
+# aunque venga en tres palabras, así que el agente de correo la marca sin
+# mirar palabras clave. Una línea por dominio.
+shipit.cl

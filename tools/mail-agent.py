@@ -37,6 +37,20 @@ PALABRAS_LEAD = [
     "ultima milla", "logística", "logistica", "operaci",
 ]
 
+# A quién le escribimos. Una respuesta de estos dominios es un lead sin
+# importar qué palabras traiga: "¿de qué se trata?" son tres palabras y no
+# activa ninguna regla, pero es la respuesta que estábamos esperando.
+PROSPECTOS = "prospectos-contactados.txt"
+
+
+def dominios_contactados(ruta=PROSPECTOS):
+    try:
+        lineas = open(ruta).read().splitlines()
+    except FileNotFoundError:
+        return set()
+    return {l.strip().lower() for l in lineas if l.strip() and not l.startswith("#")}
+
+
 # Remitentes automáticos: nunca son un lead, aunque hablen de "cuenta" o
 # "seguridad". Se descartan antes de mirar el texto.
 REMITENTES_IGNORADOS = [
@@ -116,15 +130,23 @@ def cuerpo_de(msg, limite=2000):
     return payload.decode(errors="replace")[:limite] if payload else ""
 
 
-def clasificar(asunto, remitente, cuerpo):
+def clasificar(asunto, remitente, cuerpo, contactados=frozenset()):
+    if any(x in remitente.lower() for x in REMITENTES_IGNORADOS):
+        return "otro", "", ""
+    # Antes que cualquier regla de palabras: si contesta alguien a quien le
+    # escribimos, es lo más importante que va a pasar hoy.
+    dominio = remitente.lower().rsplit("@", 1)[-1].strip(" >")
+    if any(dominio.endswith(d) for d in contactados):
+        texto = f"{asunto} {cuerpo}".lower()
+        if re.search(r"\b-?\d{1,2}\.\d{3,},\s*-?\d{1,3}\.\d{3,}", texto) or ".csv" in texto:
+            return "datos", dominio, "RESPONDIÓ un prospecto, y trae datos"
+        return "lead", dominio, "RESPONDIÓ un prospecto al que le escribimos"
     try:
         r = ollama(PROMPT.format(asunto=asunto, remitente=remitente, cuerpo=cuerpo))
         if r.get("categoria") in ("lead", "datos", "otro"):
             return r["categoria"], r.get("empresa", ""), r.get("resumen", "")
     except Exception as e:
         print(f"  (ollama no disponible: {e.__class__.__name__}; uso reglas)", file=sys.stderr)
-    if any(x in remitente.lower() for x in REMITENTES_IGNORADOS):
-        return "otro", "", ""
     texto = f"{asunto} {cuerpo}".lower()
     if re.search(r"\b-?\d{1,2}\.\d{3,},\s*-?\d{1,3}\.\d{3,}", texto) or ".csv" in texto:
         return "datos", "", "trae coordenadas o un archivo de viajes"
@@ -162,6 +184,10 @@ def main():
     for c in CARPETAS:
         M.create(c)   # si ya existe, IMAP responde NO y seguimos
 
+    contactados = dominios_contactados()
+    if contactados:
+        print(f"prospectos contactados: {', '.join(sorted(contactados))}")
+
     M.select("INBOX")
     _, data = M.search(None, "UNSEEN")
     ids = data[0].split()[: a.limit]
@@ -172,7 +198,7 @@ def main():
         msg = email.message_from_bytes(d[0][1])
         asunto = str(email.header.make_header(email.header.decode_header(msg.get("Subject", ""))))
         remitente = msg.get("From", "")
-        cat, empresa, resumen = clasificar(asunto, remitente, cuerpo_de(msg))
+        cat, empresa, resumen = clasificar(asunto, remitente, cuerpo_de(msg), contactados)
         etiqueta = f"[{cat}]" + (f" {empresa}" if empresa else "")
         print(f"  {etiqueta:22} {remitente[:38]:38} {asunto[:40]}")
         if resumen:
