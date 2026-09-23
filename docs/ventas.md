@@ -109,3 +109,38 @@ La última pregunta es la importante: obliga a responder algo concreto.
 
 Ese último párrafo es el que consigue la verdad de terreno, que es lo que
 convierte esto en producto.
+
+---
+
+## 5. Los dos primeros, ya escritos
+
+### Shipit — borrador en Gmail, listo para revisar y enviar
+
+Está en los borradores de `etacheck1@gmail.com`, dirigido a `contacto@shipit.cl`,
+que es la dirección pública que publican en su página de contacto. Antes de
+apretar enviar, revisar que el **De** diga `contacto@etacheck.cl` y no el Gmail.
+
+### Envíame — no publican correo, solo formulario
+
+En `enviame.io/contacto/` no hay ninguna dirección, ni en el pie de página.
+El formulario pide: nombre, teléfono, correo, página web, empresa, país,
+cuántos envíos hiciste el último mes, y cómo podemos ayudarte.
+
+Está pensado para un comercio que quiere despachar, no para esto, así que en
+"cuántos envíos" corresponde la opción más baja: no somos un cargador. Lo que
+importa es el último campo:
+
+> Mido precisión de tiempos de viaje en corredores urbanos: consulto el mismo
+> trayecto cada 30 minutos y lo contrasto con el tiempo real. El error no es
+> parejo: en un mismo corredor va de 4% de madrugada a más de 20% en la punta,
+> y el sesgo es local, no se traslada entre ciudades.
+>
+> Para una plataforma multicourier eso significa que parte del incumplimiento
+> no es del courier, es de la hora. Puedo medir dos semanas un corredor suyo
+> sin costo y entregarles el error por franja horaria y el factor que lo
+> corrige. El método está abierto en etacheck.cl/metodo.
+>
+> Busco conversar con quien vea precisión de entrega o datos de última milla.
+
+Para Envíame la vía más directa es igual LinkedIn: Jefe o Gerente de Última
+Milla, o el analista de datos de logística. El formulario cae en ventas.
