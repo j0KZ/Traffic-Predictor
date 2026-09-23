@@ -42,55 +42,64 @@ publica solo sobre datos propios y del cliente.
 
 ## 2. Publicación en LinkedIn
 
-Versión segura, sin publicar comparaciones entre proveedores hasta tener el
-permiso del punto 1.
+Con el estudio publicado, esta es la versión al día. Un dato duro, lo que falló,
+y una pregunta cerrada al final.
 
-> Llevo un mes midiendo tiempos de viaje en 25 corredores urbanos, de Santiago
-> a Yakarta, cada 30 minutos.
+> Medí 466 viajes que de verdad ocurrieron contra lo que dos de las fuentes de
+> ruteo más usadas habrían predicho para ese mismo instante. 591 comparaciones.
 >
-> Un hallazgo que no esperaba: el error de las APIs de ruteo no es parejo. En
-> un mismo corredor puede ser de 2% a las 3 de la mañana y de 20% a las 8. Y
-> el sesgo es local: lo aprendido en una ciudad no sirve en la de al lado.
+> El error medio contra el reloj: 14,2%. Ya es más de lo que uno supondría.
 >
-> Para una operación que promete ventanas horarias, esto significa que el
-> margen que usas de noche no te sirve en la punta de la mañana, y que copiar
-> el margen de otra ciudad es una apuesta.
+> Pero el dato que me hizo cambiar el producto es otro. Los doce corredores
+> salen del mismo punto, en la misma ciudad, el mismo mes. Y el margen que cada
+> uno necesita para cumplirle al 90% de los clientes va de ×1,04 a ×1,41.
 >
-> Lo medible: con una o dos mediciones reales por corredor y franja, el error
-> baja a menos de la mitad.
+> Cambia solo el destino, y el margen se triplica.
 >
-> Si repartes con ventana horaria y quieres saber cuánto se equivoca tu
-> proveedor en TUS rutas, escríbeme. Mido dos semanas sin costo.
+> Eso significa que el margen plano que usa casi toda operación —×1,25, ×1,20,
+> el que sea— falla en los corredores difíciles y regala capacidad en los
+> fáciles, al mismo tiempo.
+>
+> Publico también lo que no funcionó: calcular un factor de corrección por
+> corredor y aplicarlo NO baja el error medio. La dispersión dentro de un
+> corredor es mayor que el sesgo, y un factor corrige sesgo, no varianza.
+> Recentra la predicción, no la aprieta. Quien te ofrezca bajar tu error a la
+> mitad con un multiplicador no lo ha medido contra viajes reales.
+>
+> Lo que sí se puede saber es cuál es la ventana correcta para cada corredor y
+> cada hora. Eso se mide.
+>
+> Método, datos y límites: etacheck.cl/estudio
+>
+> Si reparten con ventana horaria y quieren saber el margen de sus rutas, mido
+> un corredor dos semanas sin costo. Respóndeme con una comuna.
 
 Ritmo: una publicación al mes, con un dato duro. No más.
 
----
-
 ## 3. Acercamiento directo
 
-Para jefes de operaciones, distribución o flota. Corto, sin adjuntos.
+Para jefes de operaciones, distribución o flota. Corto, sin adjuntos. Abre con
+el dato, cierra con una pregunta que se contesta en una palabra.
 
-> Asunto: cuánto se equivoca tu ETA en la punta de la mañana
+> Asunto: el margen que tu ETA necesita no es el que estás usando
 >
 > Hola [nombre],
 >
-> Mido precisión de tiempos de viaje en corredores urbanos. En las 25 rutas que
-> sigo, el error del proveedor cambia fuerte según la hora: donde de madrugada
-> acierta al 2%, en la punta se va al 20%.
+> Medí 466 viajes reales contra lo que predecían dos de las fuentes de ruteo más
+> usadas. El margen que cada corredor necesita para cumplirle al 90% va de ×1,04
+> a ×1,41, con el mismo origen y en la misma ciudad.
 >
-> Si [empresa] promete ventanas de entrega, ese error se paga en reprogramaciones.
+> O sea que el margen plano que usa tu operación falla en los corredores
+> difíciles y regala capacidad en los fáciles, y no hay forma de saber cuál es
+> cuál sin medirlo. El estudio completo, con lo que no funcionó, está en
+> etacheck.cl/estudio
 >
-> Te ofrezco medir tu corredor principal dos semanas, sin costo ni compromiso.
-> Te entrego el desglose por franja horaria y cuántas entregas al mes explica ese
-> error. Si te sirve, conversamos; si no, te quedas con el dato.
+> Si [empresa] promete ventanas de entrega, mido un corredor dos semanas sin
+> costo y te entrego la tabla de márgenes por franja horaria.
 >
-> ¿Cuál es la ruta que más te duele?
+> ¿Cuál es la ruta que más se les cae?
 >
 > [firma]
-
-La última pregunta es la importante: obliga a responder algo concreto.
-
----
 
 ## 4. Respuesta cuando pidan la medición
 

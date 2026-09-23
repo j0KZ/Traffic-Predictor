@@ -36,10 +36,10 @@ Buscar en LinkedIn por empresa y cargo. Los que sufren el problema:
 
 Nota de conexión, cabe en los 300 caracteres que deja LinkedIn:
 
-> Hola [nombre]. Mido precisión de ETA en corredores urbanos: el error salta de
-> 4% de madrugada a más de 20% en la punta, y el sesgo es local. Mido dos
-> semanas un corredor de [empresa] sin costo y te paso el error por franja.
-> Método abierto en etacheck.cl/metodo ¿Te interesa verlo?
+> Hola [nombre]. Medí 466 viajes reales contra el ETA de dos proveedores: el
+> margen para cumplir el 90% va de ×1,04 a ×1,41 en la misma ciudad. Un margen
+> plano falla en unos corredores y sobra en otros. Mido un corredor de [empresa]
+> dos semanas sin costo: etacheck.cl/estudio ¿Te interesa verlo?
 
 Si acepta y conversan, ahí va el texto largo del punto 3 de `ventas.md`.
 
@@ -50,10 +50,12 @@ ejecutivo comercial contacta en 48 horas. El ejecutivo es de ventas, no de
 operaciones, pero sirve de puerta: pedirle que derive a quien mide
 cumplimiento de plazos.
 
-> Quiero conversar con quien mida cumplimiento de plazos de entrega. Mido
-> precisión de tiempos de viaje en corredores urbanos y el error por franja
-> horaria llega a más de 20% en la punta de la mañana. Ofrezco medir un
-> corredor de Chilexpress dos semanas sin costo. Método en etacheck.cl/metodo
+> Quiero conversar con quien mida cumplimiento de plazos de entrega. Medí 466
+> viajes reales contra el ETA de dos proveedores de ruteo: el margen necesario
+> para cumplir el 90% va de ×1,04 a ×1,41 entre corredores de la misma ciudad,
+> así que un margen plano falla en unos y sobra en otros. Ofrezco medir un
+> corredor de Chilexpress dos semanas sin costo, y entregar la tabla de márgenes
+> por franja horaria. Estudio completo en etacheck.cl/estudio
 
 ## Orden que le daría
 
