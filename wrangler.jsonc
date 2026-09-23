@@ -1,0 +1,14 @@
+{
+  // Publica el sitio estático de ETA Check en Cloudflare Workers.
+  // Con este archivo, Workers Builds puede desplegar desde el repo: cada
+  // push a main republica etacheck.cl sin subir nada a mano.
+  "name": "traffic-predictor",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./site",
+    // /metodo sirve metodo.html, y una ruta inexistente cae en el 404
+    // propio de Cloudflare en vez de la portada.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
