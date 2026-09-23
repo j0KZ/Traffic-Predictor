@@ -8,7 +8,7 @@ Dos modos:
 
   Auditoría (con --viajes): compara el ETA del proveedor contra los viajes
   REALES del cliente. Es el modo que vale, porque la verdad es suya: mide
-  error por franja, propone el factor de corrección y estima el costo de
+  error por franja, el margen que exige cada una para cumplir el 90% y el costo de
   seguir como está.
 
 CSV de viajes: corredor,inicio_utc,duracion_s
@@ -83,6 +83,12 @@ def perfil(db, rutas, desde):
     return out
 
 
+def miles(x, decimales=0):
+    """Formato chileno: punto para miles, coma para decimales."""
+    t = f"{x:,.{decimales}f}"
+    return t.replace(",", "@").replace(".", ",").replace("@", ".")
+
+
 def fmt_min(s):
     return f"{int(round(s / 60))} min"
 
@@ -95,6 +101,8 @@ def main():
     ap.add_argument("--entregas-dia", type=int, default=0)
     ap.add_argument("--costo-atraso", type=float, default=0, help="costo de una entrega tarde")
     ap.add_argument("--moneda", default="CLP")
+    ap.add_argument("--margen-actual", type=float, default=1.25,
+                    help="el margen plano que la operación usa hoy sobre el ETA")
     ap.add_argument("--dias", type=int, default=30)
     ap.add_argument("--out", default="reports")
     a = ap.parse_args()
@@ -115,24 +123,31 @@ def main():
                     row["inicio_utc"].replace("Z", "+00:00")).timestamp())
                 viajes.append((row["corredor"], ts, int(row["duracion_s"])))
         datos = auditar(db, viajes, rutas)
-        errores_todos = []
+        errores_todos, todas_razones = [], []
         for (corridor, prov, b), v in sorted(datos.items()):
             if len(v) < 2:
                 continue
             errs = [abs(s - r) / r for s, r in v]
-            factor = math.exp(statistics.mean(math.log(r / s) for s, r in v))
-            corregidos = [abs(s * factor - r) / r for s, r in v]
+            # Lo que decide si se cumple la ventana no es el error medio: es
+            # cuántas veces el viaje tardó más que lo prometido, y cuánto
+            # margen hace falta para cubrir al 90%. Medido contra viajes
+            # reales, corregir el ETA no reduce el error (ver metodo.html).
+            razones = sorted(r / s for s, r in v)
+            todas_razones += razones
+            tarde = sum(1 for x in razones if x > 1) / len(razones)
+            margen = razones[max(0, int(len(razones) * 0.9) - 1)]
             errores_todos += errs
             filas.append({
                 "corredor": rutas.get(corridor, {}).get("label", corridor),
                 "prov": prov, "banda": b, "n": len(v),
                 "error": statistics.mean(errs) * 100,
-                "factor": factor,
-                "corregido": statistics.mean(corregidos) * 100,
+                "tarde": tarde * 100,
+                "margen": margen,
             })
         resumen["error"] = statistics.mean(errores_todos) * 100 if errores_todos else 0
-        resumen["corregido"] = (statistics.mean([f["corregido"] for f in filas])
-                                if filas else 0)
+        resumen["tarde"] = statistics.mean([f["tarde"] for f in filas]) if filas else 0
+        resumen["margen"] = max([f["margen"] for f in filas], default=1.0)
+        resumen["razones"] = sorted(todas_razones)
         resumen["viajes"] = len(viajes)
     else:
         datos = perfil(db, rutas, desde)
@@ -152,31 +167,37 @@ def main():
     # Plata: cuántas entregas se caen por el error actual, y cuántas se salvan.
     plata = ""
     if a.entregas_dia and a.costo_atraso and modo == "auditoría":
-        # Una entrega llega tarde cuando el ETA se queda corto más que el margen
-        # típico de la ventana. Aproximamos con la mitad del error medio.
-        tarde_hoy = a.entregas_dia * (resumen["error"] / 100) / 2
-        tarde_calib = a.entregas_dia * (resumen["corregido"] / 100) / 2
-        ahorro = (tarde_hoy - tarde_calib) * a.costo_atraso * 30
+        # Contra el margen que la operación ya usa, no contra el ETA crudo:
+        # nadie promete el ETA pelado, y suponerlo infla la cifra hasta el
+        # ridículo. El escenario con el margen medido incumple el 10% por
+        # construcción del percentil.
+        razones = resumen.get("razones") or [1.0]
+        falla_hoy = sum(1 for x in razones if x > a.margen_actual) / len(razones)
+        tarde_hoy = a.entregas_dia * falla_hoy
+        tarde_calib = a.entregas_dia * 0.10
+        ahorro = max(0, tarde_hoy - tarde_calib) * a.costo_atraso * 30
         plata = f"""
   <div class="hero">
-    <div class="big">{ahorro:,.0f} {a.moneda}</div>
-    <p>al mes en entregas que dejarían de llegar tarde, con {a.entregas_dia} entregas diarias
-       y un costo de {a.costo_atraso:,.0f} {a.moneda} por atraso. Hoy se caen unas
-       {tarde_hoy:.0f} al día; con el ETA corregido, {tarde_calib:.0f}.</p>
-  </div>""".replace(",", ".")
+    <div class="big">{miles(ahorro)} {a.moneda}</div>
+    <p>al mes en entregas que dejarían de salirse de la ventana, con {miles(a.entregas_dia)}
+       entregas diarias y un costo de {miles(a.costo_atraso)} {a.moneda} por reprogramación.
+       Con el margen plano de ×{miles(a.margen_actual, 2)} que se usa hoy se caen unas
+       {miles(tarde_hoy)} al día; con el margen medido por franja, {miles(tarde_calib)}.</p>
+  </div>"""
 
     rows = "\n".join(
         f"""      <tr><td>{f['corredor']}</td><td>{f['banda']}</td><td>{f['prov']}</td>
-        <td class="num">{f['n']}</td><td class="num alto">{f['error']:.1f}%</td>
-        <td class="num">{f['factor']:.3f}</td><td class="num bajo">{f['corregido']:.1f}%</td></tr>"""
+        <td class="num">{f['n']}</td><td class="num">{f['error']:.1f}%</td>
+        <td class="num alto">{f['tarde']:.0f}%</td>
+        <td class="num bajo">×{f['margen']:.2f}</td></tr>""".replace(".", ",")
         for f in filas) if modo == "auditoría" else "\n".join(
         f"""      <tr><td>{f['corredor']}</td><td>{f['banda']}</td><td class="num">{f['n']}</td>
         <td class="num">{fmt_min(f['factor'])}</td><td class="num">{fmt_min(f['corregido'])}</td>
         <td class="num alto">+{f['error']:.0f}%</td></tr>""" for f in filas)
 
     encabezados = ("<th>Corredor</th><th>Franja</th><th>Fuente</th><th class='num'>Viajes</th>"
-                   "<th class='num'>Error actual</th><th class='num'>Factor</th>"
-                   "<th class='num'>Error corregido</th>") if modo == "auditoría" else (
+                   "<th class='num'>Error</th><th class='num'>Llegan tarde</th>"
+                   "<th class='num'>Margen 90%</th>") if modo == "auditoría" else (
                    "<th>Corredor</th><th>Franja</th><th class='num'>Muestras</th>"
                    "<th class='num'>Típico</th><th class='num'>Peor caso (p90)</th>"
                    "<th class='num'>Margen</th>")
@@ -187,16 +208,20 @@ def main():
              f"Medimos sus corredores cada 30 minutos durante {a.dias} días. "
              f"Todavía sin viajes reales: este es el comportamiento observado.")
 
-    titular = (f"{resumen['error']:.1f}%" if modo == "auditoría" else f"{len(filas)}")
-    subtitular = ("de error medio del proveedor contra sus viajes reales."
+    titular = (f"{resumen['tarde']:.0f}%" if modo == "auditoría" else f"{len(filas)}")
+    subtitular = ("de sus viajes tardaron más que el ETA del proveedor."
                   if modo == "auditoría" else "combinaciones de corredor y franja medidas.")
 
     html = PAGE.format(
         cliente=a.cliente, modo=modo.title(), intro=intro, plata=plata,
         titular=titular, subtitular=subtitular, encabezados=encabezados, rows=rows,
         fecha=datetime.now(timezone.utc).strftime("%d-%m-%Y"),
-        corregido=(f"<p><strong>Con la corrección aplicada el error baja a "
-                   f"{resumen['corregido']:.1f}%.</strong></p>" if modo == "auditoría" else ""))
+        corregido=(f"<p><strong>El margen que exige su corredor más difícil es "
+                   f"×{resumen['margen']:.2f}".replace(".", ",") + f" para cumplirle al 90%.</strong> Un margen plano "
+                   f"más chico incumple ahí, y uno más grande regala capacidad en las franjas "
+                   f"tranquilas. El error medio del proveedor es {resumen['error']:.1f}%, y "
+                   f"corregirlo no lo reduce: lo que cambia el cumplimiento es el margen.</p>"
+                   if modo == "auditoría" else ""))
 
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -255,11 +280,12 @@ PAGE = """<!DOCTYPE html>
     <h2>Cómo se midió</h2>
     <p>Cada corredor se consulta cada 30 minutos a dos proveedores de ruteo. En modo auditoría,
        cada viaje real informado se compara con la predicción vigente en ese mismo momento,
-       tolerando hasta 15 minutos de diferencia entre ambos registros. El factor es la razón
-       mediana entre lo real y lo predicho: multiplicando la predicción por ese número se
-       obtiene la columna corregida.</p>
-    <p>Las franjas son hora local del corredor. El cálculo de entregas tarde asume que el
-       error se reparte por igual entre adelantarse y atrasarse.</p>
+       tolerando hasta 15 minutos de diferencia entre ambos registros. El margen es el
+       percentil 90 de la razón entre lo real y lo predicho: multiplicar la predicción por ese
+       número deja fuera de la ventana solo a uno de cada diez viajes.</p>
+    <p>Las franjas son hora local del corredor. Las entregas tarde de hoy no se estiman: es el
+       porcentaje medido de viajes que tardaron más que lo prometido. El escenario con margen
+       incumple el 10% por construcción del percentil.</p>
   </div>
 </div></body></html>
 """
