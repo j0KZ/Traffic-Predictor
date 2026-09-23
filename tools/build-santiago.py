@@ -113,14 +113,26 @@ def build(db_path, out_dir, routes_dir, extra):
                   f'<td class="num muted">0</td>'
                   f'<td class="nulo" colspan="5">recién dado de alta, midiendo</td></tr>\n')
 
-    # La franja que más se desvía, sumando todos los corredores.
-    por_franja = {}
-    for _, _, by_hour, _ in medido:
-        for nombre, _, horas, _ in FRANJAS:
-            por_franja.setdefault(nombre, []).extend(
-                x for h in horas for x in by_hour.get(h, []))
-    peor = max((v for v in por_franja.items() if v[1]), key=lambda kv: statistics.median(kv[1]))
-    mejor = min((v for v in por_franja.items() if v[1]), key=lambda kv: statistics.median(kv[1]))
+    # El titular compara corredores DENTRO de la misma franja, no franjas
+    # entre sí: mezclar una franja que solo tiene datos de un corredor con
+    # otra que los tiene de cuatro daría una cifra que no significa nada.
+    mejor_contraste = None
+    for nombre, _, horas, prosa in FRANJAS:
+        por_ruta = []
+        for label, _, by_hour, _ in medido:
+            v = [x for h in horas for x in by_hour.get(h, [])]
+            if len(v) >= 3:
+                por_ruta.append((statistics.median(v), label))
+        if len(por_ruta) < 3:
+            continue
+        por_ruta.sort()
+        (bajo, ruta_baja), (alto, ruta_alta) = por_ruta[0], por_ruta[-1]
+        if bajo > 0 and (mejor_contraste is None or alto / bajo > mejor_contraste[0]):
+            mejor_contraste = (alto / bajo, prosa, alto, ruta_alta, bajo, ruta_baja, len(por_ruta))
+    if mejor_contraste is None:
+        raise SystemExit("todavía no hay tres corredores con datos en una misma franja")
+    _, franja_prosa, alto, ruta_alta, bajo, ruta_baja, cuantos = mejor_contraste
+    veces = alto / bajo
     now = datetime.now(timezone.utc)
 
     html = PAGE.format(
@@ -130,10 +142,13 @@ def build(db_path, out_dir, routes_dir, extra):
         pares=f"{len(todo):,}".replace(",", "."),
         mediana=fmt(statistics.median(todo)),
         maximo=fmt(max(todo)),
-        peor_franja=PROSA[peor[0]],
-        peor_valor=fmt(statistics.median(peor[1])),
-        mejor_franja=PROSA[mejor[0]],
-        mejor_valor=fmt(statistics.median(mejor[1])),
+        hero_valor=fmt(alto),
+        hero_ruta=ruta_alta,
+        hero_bajo=fmt(bajo),
+        hero_ruta_baja=ruta_baja,
+        hero_franja=franja_prosa,
+        hero_veces=f"{veces:.1f}".replace(".", ","),
+        hero_cuantos=cuantos,
         corredores_label="corredor con datos" if len(medido) == 1 else "corredores con datos",
         encabezados="".join(f'<th class="num">{n}<span>{h}</span></th>' for n, h, _, _ in FRANJAS),
         filas=filas.rstrip(),
@@ -237,12 +252,14 @@ PAGE = """<!DOCTYPE html>
   <h1>Santiago, medido cada 30 minutos</h1>
   <p class="lead">Consultamos el mismo trayecto, en el mismo instante, a dos de las fuentes de
      tiempo de viaje más usadas del mercado. Cuando las dos no coinciden, al menos una le está
-     mintiendo a la operación que la usa. Esto es lo que llevamos medido.</p>
+     mintiendo a la operación que la usa. Esto es lo que llevamos medido, corredor por corredor:
+     el desacuerdo no se parece entre rutas ni entre horas.</p>
 
   <div class="hero">
-    <div class="big">{peor_valor}</div>
-    <p>de desacuerdo mediano en la {peor_franja}, contra {mejor_valor} en la {mejor_franja}.
-       El mismo trayecto, la misma ciudad, distinta hora.</p>
+    <div class="big">{hero_valor}</div>
+    <p>de desacuerdo en <strong>{hero_ruta}</strong>, en la {hero_franja}. A la misma hora y en la misma
+       ciudad, <strong>{hero_ruta_baja}</strong> marca {hero_bajo}: {hero_veces} veces menos.
+       Por eso un factor de corrección no se copia de una ruta a la de al lado.</p>
   </div>
 
   <div class="stats">
