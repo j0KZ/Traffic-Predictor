@@ -132,3 +132,55 @@ Honestidad sobre el modelo, que es lo que hay que vigilar:
 - **Los términos de los proveedores** limitan qué se publica, no qué se vende.
   Medir para un cliente y entregarle su informe está permitido; publicar
   comparaciones nombrando proveedores, no, hasta que respondan.
+
+## 7. Qué nos protege y qué no
+
+### Lo que no nos protege
+
+- **El método.** Está publicado y un buen ingeniero lo replica en una semana.
+  Publicarlo fue una decisión de confianza, no una ventaja.
+- **La serie de 25 corredores.** Nuestro propio hallazgo la desarma: con dos
+  mediciones el error ya baja a 5,8% y la tercera casi no aporta. Entonces la
+  barrera de entrada para competir por *un cliente concreto* es de dos semanas
+  de medición, no de meses. La serie histórica defiende el índice público y la
+  credibilidad, no la cuenta de un cliente.
+- **Las herramientas.** Cuatro scripts de Python. No son un activo.
+
+### Lo que sí nos protege
+
+1. **La neutralidad, que es estructural.** Un proveedor de ruteo no puede
+   auditarse a sí mismo, y quien vende ETA predictivo (NextBillion, Locus) no
+   puede vender "cuánto se equivoca tu ETA" sin cortarse las piernas. Los que
+   tienen más datos y más plata están excluidos por conflicto de interés, no
+   por capacidad. Eso no se copia sin canibalizarse.
+2. **Estar dentro del flujo.** Un informe se lee y se archiva. Un factor que
+   entra por API al TMS y desde el cual se fijan las ventanas de promesa no se
+   saca sin volver a calibrar las promesas. Por eso el producto de API importa
+   más que el de informe, y conviene llegar ahí rápido.
+3. **El corpus de viajes reales.** Es lo único que compone. Ningún proveedor
+   tiene "qué pasó de verdad" con la flota de otro. Cada cliente que entrega su
+   CSV agrega algo que no se compra en ninguna parte.
+4. **Ser el número de referencia.** Transit App no defiende su benchmark con
+   tecnología, lo defiende con que es el que todos citan. Eso se construye
+   publicando seguido y equivocándose en público cuando corresponde.
+
+### La amenaza real no es un imitador
+
+Es el analista de datos del propio cliente. Puede hacer esto, y en una empresa
+grande eventualmente lo va a hacer. Las tres razones por las que no lo hace hoy:
+no es KPI de nadie, requiere una medición que corre para siempre y no un
+proyecto de tres semanas, y quien podría construirlo está ocupado.
+
+La defensa ahí es el precio, no la tecnología: $450.000 al mes contra un
+analista que cuesta $2.500.000. Mientras contratarnos sea más barato que la
+fracción del sueldo que tomaría el problema, construirlo en casa es irracional.
+Si subimos el precio a donde duela, invitamos a que lo hagan ellos.
+
+### La decisión pendiente
+
+`metodo.html` promete que los viajes de un cliente no se usan para calibrar
+rutas de otro. Esa promesa gana confianza y **bloquea el único activo que
+compone**, el corpus. Recomiendo partirla en dos: mantener intacto que los
+datos de un cliente nunca calibran a otro ni se exponen, y agregar una opción
+de consentimiento para que entren, sin identificación, en las estadísticas
+agregadas del índice. Se conserva lo que importa y el corpus crece.
