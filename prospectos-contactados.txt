@@ -2,3 +2,4 @@
 # aunque venga en tres palabras, así que el agente de correo la marca sin
 # mirar palabras clave. Una línea por dominio.
 shipit.cl
+99minutos.com
