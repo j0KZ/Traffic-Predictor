@@ -71,8 +71,9 @@ sigue bajando.
 > usa uno, y casi siempre es el mismo para todas sus rutas.
 >
 > Medí cuánto margen necesita cada corredor para cumplirle al 90% de los
-> clientes. Los doce corredores salen del mismo punto, en la misma ciudad, el
-> mismo mes. El resultado va de ×1,04 a ×1,41.
+> clientes. Los doce corredores salen del mismo punto —el aeropuerto— hacia
+> distintos destinos de la misma ciudad, en el mismo mes. El resultado va de
+> ×1,04 a ×1,41.
 >
 > Cambia solo el destino, y el margen se triplica.
 >
