@@ -51,6 +51,14 @@ def dominios_contactados(ruta=PROSPECTOS):
     return {l.strip().lower() for l in lineas if l.strip() and not l.startswith("#")}
 
 
+# Quien llega por la publicación o por el estudio: una sola de estas frases
+# basta, porque son específicas de nuestra campaña y ningún aviso automático
+# las usa. Un "vi tu post, cuéntame más" no activa las palabras de logística.
+PALABRAS_CAMPANA = [
+    "etacheck", "tu post", "su post", "tu publicaci", "su publicaci",
+    "linkedin", "el estudio", "tu estudio", "el margen", "los 466", "chicago",
+]
+
 # Remitentes automáticos: nunca son un lead, aunque hablen de "cuenta" o
 # "seguridad". Se descartan antes de mirar el texto.
 REMITENTES_IGNORADOS = [
@@ -150,6 +158,9 @@ def clasificar(asunto, remitente, cuerpo, contactados=frozenset()):
     texto = f"{asunto} {cuerpo}".lower()
     if re.search(r"\b-?\d{1,2}\.\d{3,},\s*-?\d{1,3}\.\d{3,}", texto) or ".csv" in texto:
         return "datos", "", "trae coordenadas o un archivo de viajes"
+    campana = [p for p in PALABRAS_CAMPANA if p in texto]
+    if campana:
+        return "lead", "", f"llega por la campaña: menciona {campana[0]}"
     hits = [p for p in PALABRAS_LEAD if p in texto]
     if len(hits) >= 2:
         return "lead", "", f"menciona {', '.join(hits[:3])}"
