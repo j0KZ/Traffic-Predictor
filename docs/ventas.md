@@ -42,37 +42,57 @@ publica solo sobre datos propios y del cliente.
 
 ## 2. Publicación en LinkedIn
 
-Con el estudio publicado, esta es la versión al día. Un dato duro, lo que falló,
-y una pregunta cerrada al final.
+Abre con la frase que todos reconocen, explica qué es un margen antes de usar la
+cifra, y recién ahí los datos. Sin la entrada, el lector ve números sueltos y
+sigue bajando.
 
-> Medí 466 viajes que de verdad ocurrieron contra lo que dos de las fuentes de
-> ruteo más usadas habrían predicho para ese mismo instante. 591 comparaciones.
+> "Tu pedido llega entre 3 y 4 de la tarde."
 >
-> El error medio contra el reloj: 14,2%. Ya es más de lo que uno supondría.
+> Detrás de esa frase hay un ETA: la estimación de tiempo de viaje que entrega un
+> proveedor de ruteo, el mismo tipo de número que te muestra Google Maps. Si se
+> equivoca, la ventana se cae, alguien reprograma un camión y el cliente reclama.
 >
-> Pero el dato que me hizo cambiar el producto es otro. Los doce corredores
-> salen del mismo punto, en la misma ciudad, el mismo mes. Y el margen que cada
-> uno necesita para cumplirle al 90% de los clientes va de ×1,04 a ×1,41.
+> Me quedé con la duda de cuánto se equivoca de verdad. No contra otra app —eso
+> es comparar dos predicciones entre sí— sino contra el reloj.
+>
+> Chicago publica cada viaje de taxi: hora de salida y duración exacta,
+> anonimizados. Tomé 466 viajes de más de 25 minutos y le pregunté a dos de las
+> fuentes de ruteo más usadas del mercado qué habrían predicho para ese mismo
+> instante. 591 comparaciones.
+>
+> Error medio: 14,2%. En un viaje de 40 minutos son casi 6 minutos de diferencia,
+> y es bastante más de lo que uno supondría de una tecnología que ya damos por
+> resuelta.
+>
+> Pero el dato que me hizo cambiar el producto es otro.
+>
+> Hablemos de margen. Es por cuánto multiplicas el ETA antes de prometerlo: si el
+> sistema dice 30 minutos y tú prometes 39, tu margen es ×1,30. Toda operación
+> usa uno, y casi siempre es el mismo para todas sus rutas.
+>
+> Medí cuánto margen necesita cada corredor para cumplirle al 90% de los
+> clientes. Los doce corredores salen del mismo punto, en la misma ciudad, el
+> mismo mes. El resultado va de ×1,04 a ×1,41.
 >
 > Cambia solo el destino, y el margen se triplica.
 >
-> Eso significa que el margen plano que usa casi toda operación —×1,25, ×1,20,
-> el que sea— falla en los corredores difíciles y regala capacidad en los
-> fáciles, al mismo tiempo.
+> Un margen plano, entonces, falla en los corredores difíciles y regala capacidad
+> en los fáciles. Al mismo tiempo. Y no hay manera de saber cuál es cuál sin
+> medirlo.
 >
-> Publico también lo que no funcionó: calcular un factor de corrección por
-> corredor y aplicarlo NO baja el error medio. La dispersión dentro de un
+> También publico lo que no funcionó: calcular un factor de corrección por
+> corredor y aplicarlo al ETA no baja el error medio. La dispersión dentro de un
 > corredor es mayor que el sesgo, y un factor corrige sesgo, no varianza.
-> Recentra la predicción, no la aprieta. Quien te ofrezca bajar tu error a la
-> mitad con un multiplicador no lo ha medido contra viajes reales.
+> Recentra la predicción, no la aprieta. Si alguien te ofrece bajar tu error a la
+> mitad con un multiplicador, no lo midió contra viajes reales.
 >
 > Lo que sí se puede saber es cuál es la ventana correcta para cada corredor y
 > cada hora. Eso se mide.
 >
-> Método, datos y límites: etacheck.cl/estudio
+> Método, datos y límites, incluidos los del propio estudio: etacheck.cl/estudio
 >
-> Si reparten con ventana horaria y quieren saber el margen de sus rutas, mido
-> un corredor dos semanas sin costo. Respóndeme con una comuna.
+> Si reparten con ventana horaria y quieren saber el margen de sus rutas, mido un
+> corredor dos semanas sin costo. Respóndeme con una comuna.
 
 Ritmo: una publicación al mes, con un dato duro. No más.
 
